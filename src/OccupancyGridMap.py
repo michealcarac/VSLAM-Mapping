@@ -9,6 +9,12 @@
 # Internal Imports
 
 # External Imports
+import matplotlib.pyplot as plt
+from matplotlib import colors
+import numpy as np
+from math import inf
+from random import gauss
+import csv
 
 class OccupancyGridMap:
   """
@@ -65,7 +71,7 @@ class OccupancyGridMap:
     Method to get the occupancy value at a certain coordinate location.
 
     Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_size.
+      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
 
     Returns:
       value (float32): The value of occupancy.
@@ -104,7 +110,7 @@ class OccupancyGridMap:
     Method to set the occupancy value at a certain coordinate location.
 
     Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_size.
+      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
       value (float32):              The value of occupancy to set.
 
     Returns:
@@ -138,11 +144,6 @@ class OccupancyGridMap:
     # Get index point x,y
     x, y = index_point
 
-    # Ensure the value is valid
-    if (not self.isValidValue(value)):
-      print("ERROR: Entered value is invalid!")
-      return -1 # CDL=> Should be exception thrown?
-
     # Set the occupancy value
     self.grid_map[y][x] = value
 
@@ -153,7 +154,7 @@ class OccupancyGridMap:
     Method to check if coordinate point is occupied.
 
     Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_size.
+      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
 
     Returns:
       status (bool): Whether the position is occupied.
@@ -195,7 +196,7 @@ class OccupancyGridMap:
     Method to check if coordinate point is unoccupied.
 
     Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_size.
+      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
 
     Returns:
       status (bool): Whether the position is unoccupied.
@@ -237,7 +238,7 @@ class OccupancyGridMap:
     Method to check if coordinate point is unknown.
 
     Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_size.
+      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
 
     Returns:
       status (bool): Whether the position is unknown.
@@ -260,25 +261,12 @@ class OccupancyGridMap:
     # If not occupied or unoccupied, then unknown
     return not (isOccupiedIndex(index_point) or isUnoccupiedIndex(index_point))
 
-  def isValidValue(self, value):
-    """
-    Method to check if a value is valid.
-
-    Args:
-      value (float32): A occupancy value to check.
-
-    Returns:
-      status (bool): Whether the value is valid.
-    """
-
-    return True # CDL=> Implement later
-
   def isValidLocPoint(self, loc_point):
     """
     Method to check if coordinate point is valid.
 
     Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_size.
+      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
 
     Returns:
       status (bool): Whether the position is valid.
@@ -316,7 +304,7 @@ class OccupancyGridMap:
     Method to convert a coordinate point to an index point.
 
     Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_size.
+      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
 
     Returns:
       index_point (tuple of int): An indexed point (x, y).
@@ -333,33 +321,60 @@ class OccupancyGridMap:
       index_point (tuple of int): An indexed point (x, y).
 
     Returns:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_size.
+      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
     """
 
     return tuple(int(round(axis/self.cell_size)) for axis in index_point)
 
-  # CDL=> Here: List of methods
-  #
-  # [X] getDataLoc(self, loc_point)
-  # [X] getDataIndex(self, index_point)
-  # [X] setDataLoc(self, loc_point, value)
-  # [X] setDataIndex(self, index_point, value)
 
-  # [X] isOccupiedLoc(self, loc_point)
-  # [X] isOccupiedIndex(self, index_point)
-  # [X] isUnoccupiedLoc(self, loc_point)
-  # [X] isUnoccupiedIndex(self, index_point)
-  # [X] isUnknownLoc(self, loc_point)
-  # [X] isUnknownIndex(self, index_point)
+  def visualizeGrid(self):
+    """
+    Method to visualize a map of data.
 
-  # [X] isValidValue(self, value)
-  # [X] isValidLocPoint(self, loc_point)
-  # [X] isValidIndexPoint(self, index_point)
-  # [X] indexToLoc(self, index_point)
-  # [X] locToIndex(self, loc_point)
+    Args: None # CDL=> Add any config settings?
+    # Add setting to plot occ/unocc/unknown OR heatmap?
 
-  # [ ] visualizeGrid(self, config)
-  # [ ] fromCSV()
+    Returns: None
+    """
 
+    # Create discrete colormap
+    # Brown  : Unknown
+    # Green  : Unoccupied
+    # Blue   : Occupied
+    cmap = colors.ListedColormap(['brown', 'green', 'blue', 'brown'])
+    bounds = [-1000, 0, self.cell_threshold, 1, 1000]
+    norm = colors.BoundaryNorm(bounds, cmap.N)
+
+    # CDL=> Add title? Option to enable axis?
+    fig, ax = plt.subplots()
+    ax.imshow(self.grid_map, cmap=cmap, norm=norm)
+
+    plt.axis("off")
+    plt.show()
+
+  def fromCSV(self, filename):
+    """
+    Method to import a gridmap from a csv file.
+
+    Note: This method overwrites current grid map!
+
+    Args:
+      filename (string): The file containing MxN csv data.
+
+    Returns: None
+    """
+    with open(filename, 'r') as fd:
+        reader = csv.reader(fd)
+        self.grid_map = np.array(list(reader)).astype("float")
+
+# ------------------------------------------------------------------------------
+# End of class OccupancyGridMap
+# ------------------------------------------------------------------------------
+
+# Main code for this file. Only run if this file is the top
 if __name__ == "__main__":
-  print("Hello World!") # CDL=> Add simple example of class
+  print("Loading map data")
+  ogm = OccupancyGridMap()
+  ogm.fromCSV("Map.csv")
+  print("Visualizing grid map data")
+  ogm.visualizeGrid()
