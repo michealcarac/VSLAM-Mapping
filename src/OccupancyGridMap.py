@@ -12,6 +12,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import colors
 import numpy as np
+from scipy.spatial.distance import pdist
 from math import inf
 from random import gauss
 import csv
@@ -121,7 +122,7 @@ class OccupancyGridMap:
     index_point = self.locToIndex(loc_point)
 
     # Set the occupancy value
-    return setDataIndex(index_point, value)
+    return self.setDataIndex(index_point, value)
 
 
   def setDataIndex(self, index_point, value):
@@ -189,7 +190,7 @@ class OccupancyGridMap:
     value = self.grid_map[y][x]
 
     # Get occupied status
-    return (cell_threshold <= value <= 1)
+    return (self.cell_threshold <= value <= 1)
 
   def isUnoccupiedLoc(self, loc_point):
     """
@@ -231,7 +232,7 @@ class OccupancyGridMap:
     value = self.grid_map[y][x]
 
     # Get occupied status
-    return (0 <= value <= cell_threshold)
+    return (0 <= value <= self.cell_threshold)
 
   def isUnknownLoc(self, loc_point):
     """
@@ -245,7 +246,7 @@ class OccupancyGridMap:
     """
 
     # If not occupied or unoccupied, then unknown
-    return not (isOccupiedLoc(loc_point) or isUnoccupiedLoc(loc_point))
+    return not (self.isOccupiedLoc(loc_point) or self.isUnoccupiedLoc(loc_point))
 
   def isUnknownIndex(self, index_point):
     """
@@ -259,7 +260,7 @@ class OccupancyGridMap:
     """
 
     # If not occupied or unoccupied, then unknown
-    return not (isOccupiedIndex(index_point) or isUnoccupiedIndex(index_point))
+    return not (self.isOccupiedIndex(index_point) or self.isUnoccupiedIndex(index_point))
 
   def isValidLocPoint(self, loc_point):
     """
@@ -294,10 +295,11 @@ class OccupancyGridMap:
     x, y = index_point
 
     # Ensure the point is valid # CDL=> Check if conditional works
-    return ((x < 0) or
-            (y < 0) or
-            (np.size(self.grid_map, 1) <= x) or
-            (np.size(self.grid_map, 0) <= y))
+    return True
+           # ((x < 0) or
+           #  (y < 0) or
+           #  (np.size(self.grid_map, 1) <= x) or
+           #  (np.size(self.grid_map, 0) <= y))
 
   def locToIndex(self, loc_point):
     """
@@ -364,8 +366,55 @@ class OccupancyGridMap:
     Returns: None
     """
     with open(filename, 'r') as fd:
-        reader = csv.reader(fd)
-        self.grid_map = np.array(list(reader)).astype("float")
+      reader = csv.reader(fd)
+      self.grid_map = np.array(list(reader)).astype("float")
+
+  def fromKeyframesCSV(self, filename):
+    """
+    Method to import a gridmap from a csv file of keyframe points.
+
+    Note: This method overwrites current grid map!
+
+    Args:
+      filename (string): The file containing csv point data.
+
+    Returns: None
+    """
+    with open(filename, 'r') as fd:
+      # reader = csv.reader(fd)
+      keyframes = np.genfromtxt(filename, delimiter=",")
+      print("Shape", np.shape(keyframes))
+
+      # Calculate the smallest distance between any two points out of (x,y) points
+      point_distances = pdist(keyframes, "euclidean")
+      plt.scatter(keyframes[:,0], keyframes[:,1], marker='o')
+      plt.show()
+
+      min_dist = np.amin(point_distances)
+      avg_dist = np.average(point_distances)
+
+      print("Min Dist: ", min_dist)
+      print("Avg Dist: ", avg_dist)
+
+      keyframes = keyframes / (min_dist * 10)
+
+      max_point = np.ceil(np.amax(keyframes, axis=0))
+
+      max_point = max_point.astype(int)
+      print(max_point)
+
+      self.grid_map = np.zeros(max_point).transpose()
+      print(np.shape(keyframes))
+
+      plt.scatter(keyframes[:,0], keyframes[:,1], marker='o')
+      plt.show()
+
+
+      for point in keyframes:
+        x_index = int(np.floor(point[0]))
+        y_index = -1 * int(np.floor(point[1]))
+        self.setDataIndex((x_index, y_index), 0.6)
+
 
 # ------------------------------------------------------------------------------
 # End of class OccupancyGridMap
@@ -375,6 +424,7 @@ class OccupancyGridMap:
 if __name__ == "__main__":
   print("Loading map data")
   ogm = OccupancyGridMap()
-  ogm.fromCSV("Map.csv")
+  # ogm.fromCSV("Map.csv")
+  ogm.fromKeyframesCSV("../data/keyframes.csv")
   print("Visualizing grid map data")
   ogm.visualizeGrid()
