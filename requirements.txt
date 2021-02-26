@@ -1,6 +1,0 @@
-matplotlib
-msgpack
-numpy
-autolab_core
-opencv-python
-imageio
