@@ -328,7 +328,6 @@ class OccupancyGridMap:
 
     return tuple(int(round(axis/self.cell_size)) for axis in index_point)
 
-
   def visualizeGrid(self):
     """
     Method to visualize a map of data.
@@ -340,16 +339,16 @@ class OccupancyGridMap:
     """
 
     # Create discrete colormap
-    # Brown  : Unknown
-    # Green  : Unoccupied
-    # Blue   : Occupied
-    cmap = colors.ListedColormap(['brown', 'green', 'blue', 'brown'])
+    # Brown : Unknown
+    # Blue  : Unoccupied
+    # Green : Occupied
+    cmap = colors.ListedColormap(['brown', 'blue', 'green', 'brown'])
     bounds = [-1000, 0, self.cell_threshold, 1, 1000]
     norm = colors.BoundaryNorm(bounds, cmap.N)
 
     # CDL=> Add title? Option to enable axis?
     fig, ax = plt.subplots()
-    ax.imshow(self.grid_map, cmap=cmap, norm=norm)
+    ax.imshow(self.grid_map, origin='lower', cmap=cmap, norm=norm)
 
     plt.axis("off")
     plt.show()
@@ -380,45 +379,49 @@ class OccupancyGridMap:
 
     Returns: None
     """
-    with open(filename, 'r') as fd:
-      # reader = csv.reader(fd)
-      keyframes = np.genfromtxt(filename, delimiter=",")
-      print("Shape", np.shape(keyframes))
 
-      # Calculate the smallest distance between any two points out of (x,y) points
-      point_distances = pdist(keyframes, "euclidean")
-      plt.scatter(keyframes[:,0], keyframes[:,1], marker='o')
-      plt.show()
+    # 1.) Import the keyframe data
+    keyframes = np.genfromtxt(filename, delimiter=",")
 
-      min_dist = np.amin(point_distances)
-      avg_dist = np.average(point_distances)
+    # 2.) Calculate scale factor for data CDL=> Make dynamic somehow
+    # Calculate the smallest distance between any two points out of (x,y) points
+    point_distances = pdist(keyframes, "euclidean")
+    d = np.diff(keyframes, axis=0)
+    segdists = np.sqrt((d ** 2).sum(axis=1))
+    avg_seq_dist = np.average(segdists)
+    min_dist = np.amin(point_distances)
+    avg_dist = np.average(point_distances)
+    keyframes = keyframes / 0.6
 
-      print("Min Dist: ", min_dist)
-      print("Avg Dist: ", avg_dist)
+    # 3.) Find the max point to allocate gridmap
+    max_point = np.ceil(np.amax(keyframes, axis=0)).astype(int)
+    # Allocate array to max point size
+    self.grid_map = np.full(max_point, 0.6).transpose()
 
-      keyframes = keyframes / (min_dist * 10)
+    # 4.) Translate array of points to positive numbers
+    # Calculate minimum point
+    minValueX = np.amin(keyframes[:, 0])
+    minValueY = np.amin(keyframes[:, 1])
+    # Only translate dimension if smallest point is negative
+    if (minValueX < 0):
+      keyframes[:, 0] -= minValueX
+    if (minValueY < 0):
+      keyframes[:, 1] -= minValueY
 
-      max_point = np.ceil(np.amax(keyframes, axis=0))
-
-      max_point = max_point.astype(int)
-      print(max_point)
-
-      self.grid_map = np.zeros(max_point).transpose()
-      print(np.shape(keyframes))
-
-      plt.scatter(keyframes[:,0], keyframes[:,1], marker='o')
-      plt.show()
-
-
-      for point in keyframes:
-        x_index = int(np.floor(point[0]))
-        y_index = -1 * int(np.floor(point[1]))
-        self.setDataIndex((x_index, y_index), 0.6)
-
+    # 5.) Set keyframe nearest integer point to 0 (unoccupied)
+    for point in keyframes:
+      x_index = int(np.floor(point[0]))
+      y_index = int(np.floor(point[1]))
+      self.setDataIndex((x_index, y_index), 0)
 
 # ------------------------------------------------------------------------------
 # End of class OccupancyGridMap
 # ------------------------------------------------------------------------------
+
+# TODO: List of known todos
+# CDL=> Flip visualize map
+# CDL=> Add set unoccupied/set occupied methods for ease
+# CDL=> Save translation point for future use and location use
 
 # Main code for this file. Only run if this file is the top
 if __name__ == "__main__":
