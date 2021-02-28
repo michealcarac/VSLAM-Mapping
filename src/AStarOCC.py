@@ -86,28 +86,18 @@ def astar(map,start,end):
         # If goal is found, return the path
         if current_node == end_node:
             return return_path(current_node)
-        print(current_node)
+        #print(current_node)
         # Children!
         children = []
 
-        for new_position in near_squares:
-
-            # Get Node Position
-            node_position = (current_node.position[0]+new_position[0],current_node.position[1]+new_position[1])
-
-            # Within Range Check
-            if node_position[0] > (len(map)-1) or node_position[0] < 0 or node_position[1] > (len(map[len(map)-1])-1) or node_position[1]<0:
-                continue
-
-            # Check Walkable Points
-            if map[node_position[0]][node_position[1]] == 0:
-                continue
-
-            # Create New Node
-            new_node = NodeStar(current_node,node_position)
-
-            # Append
-            children.append(new_node)
+        for neighbor in near_squares:
+            new_pos = (current_node.position[0] + neighbor[0], current_node.position[1] + neighbor[1])
+            if 0 <= new_pos[0] < len(map) and 0 <= new_pos[1] < len(map[0]):
+                if map[new_pos[0]][new_pos[1]] == .6:
+                    new_node = NodeStar(current_node, new_pos)
+                    if not (new_node in open_list):
+                        print(current_node.position)
+                        children.append(new_node)
 
         for child in children:
             # Child on closed list
@@ -115,17 +105,14 @@ def astar(map,start,end):
                 continue
 
             # Create Heuristic
-            child.g = current_node.g + 1
+            #child.g = current_node.g + 1
             #child.g = abs(child.position[0] - start_node.position[0]) + abs(child.position[1] - start_node.position[1])
-            #child.g = current_node.g
+            child.g = current_node.g
+            #child.g = current_node.g + abs(child.position[0] - start_node.position[0]) + abs(child.position[1] - start_node.position[1])
             # Manhattan Distance
-            #child.h = abs(child.position[0] - end_node.position[0]) + abs(child.position[1] - end_node.position[1])
+            child.h = abs(child.position[0] - end_node.position[0]) + abs(child.position[1] - end_node.position[1])
 
-            child.h = ((child.position[0]-end_node.position[0]) ** 2) + ((child.position[1]-end_node.position[1]) ** 2) - 1
             child.f = child.g + child.h
-            print("child.g:",child.g)
-            print("child.h:", child.h)
-            print("child.f:", child.f)
             # Child already in open list
             if len([open_node for open_node in open_list if child.position == open_node.position and child.g > open_node.g]) > 0:
                 continue
@@ -138,12 +125,12 @@ def astar(map,start,end):
 if __name__ == "__main__":
     # Until we can pull # of rows and columns
     ogm = OccupancyGridMap()
-    ogm.fromKeyframesCSV("../data/keyframes.csv")
+    ogm.fromCSV("Map.csv")
 
     print(ogm.grid_map)
-    start = (0,0)
+    start = (2,1)
     #     row^ ^column
-    end = (7,20)
+    end =(25,9)
     #   row^ ^column
     line = astar(ogm.grid_map,start,end)
     print(line)
@@ -158,10 +145,10 @@ if __name__ == "__main__":
     # To add A star points on map
     if line != None:
         for point in line:
-            ax.scatter(point[0], point[1])
+            ax.scatter(point[1], point[0])
 
-    ax.scatter(start[0],start[1])
-    ax.scatter(end[0],end[1])
+    ax.scatter(start[1],start[0])
+    ax.scatter(end[1],end[0])
     plt.show()
 
 
