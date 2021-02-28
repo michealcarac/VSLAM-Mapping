@@ -64,8 +64,7 @@ def astar(map,start,end):
 
     # Adding a stop condition
     out_i = 0
-    # TODO: make this use length and width from OCCUPANCYGRIDMAP
-    max_i = (len(map[0])*len(map))
+    max_i = map.getMaxCol()*map.getMaxRow()
 
     # Squares we search for
     near_squares = ((0,-1),(0,1),(-1,0),(1,0))   # Four Directions, up,down,left,right
@@ -86,17 +85,16 @@ def astar(map,start,end):
         # If goal is found, return the path
         if current_node == end_node:
             return return_path(current_node)
-        #print(current_node)
+
         # Children!
         children = []
 
         for neighbor in near_squares:
             new_pos = (current_node.position[0] + neighbor[0], current_node.position[1] + neighbor[1])
-            if 0 <= new_pos[0] < len(map) and 0 <= new_pos[1] < len(map[0]):
-                if map[new_pos[0]][new_pos[1]] == .6:
+            if map.isValidIndexPoint(new_pos[::-1]): #Function takes in as X,Y
+                if map.isUnoccupiedIndex(new_pos[::-1]): #Function takes in as X,Y
                     new_node = NodeStar(current_node, new_pos)
                     if not (new_node in open_list):
-                        print(current_node.position)
                         children.append(new_node)
 
         for child in children:
@@ -113,7 +111,7 @@ def astar(map,start,end):
             child.h = abs(child.position[0] - end_node.position[0]) + abs(child.position[1] - end_node.position[1])
 
             child.f = child.g + child.h
-            # Child already in open list
+            # Child on open list
             if len([open_node for open_node in open_list if child.position == open_node.position and child.g > open_node.g]) > 0:
                 continue
 
@@ -128,11 +126,11 @@ if __name__ == "__main__":
     ogm.fromCSV("Map.csv")
 
     print(ogm.grid_map)
-    start = (2,1)
+    start = (1,0)
     #     row^ ^column
-    end =(25,9)
+    end =(25,10)
     #   row^ ^column
-    line = astar(ogm.grid_map,start,end)
+    line = astar(ogm,start,end)
     print(line)
 
     # FROM VISUALIZE MAP
@@ -141,14 +139,16 @@ if __name__ == "__main__":
     norm = colors.BoundaryNorm(bounds, cmap.N)
     fig, ax = plt.subplots()
     ax.imshow(ogm.grid_map, origin='lower', cmap=cmap, norm=norm)
-
+    # When doing poorly formatted maps:
+    #ax.imshow(ogm.grid_map, origin='lower', cmap=cmap, norm=norm, aspect='auto')
     # To add A star points on map
+    markersize = 5
     if line != None:
         for point in line:
             ax.scatter(point[1], point[0])
 
-    ax.scatter(start[1],start[0])
-    ax.scatter(end[1],end[0])
+    ax.scatter(start[1],start[0],s=markersize)
+    ax.scatter(end[1],end[0],s=markersize)
     plt.show()
 
 
