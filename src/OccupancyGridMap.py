@@ -18,401 +18,405 @@ from random import gauss
 import csv
 
 class OccupancyGridMap:
-  """
-  A class to implement a simple occupancy grid map.
-
-  The occupancy grid is defined as a matrix of values. These values
-  represent the likelyhood that a grid cell is occupied or not.
-
-  Values between (0 - 1) indicate the value of occupancy. Within that
-  range, whether a cell is considered occupied, is dependant on a whether
-  it is greater than a certain threshold (cell_threshold).
-  If these values are out of a specific range, or specifically -1, they are
-  considered unknown or unvisited.
-
-  A cell is occupied if its value >= occupancy_threshold.
-
-  Each cell represents a physical square of area with a specified size:
-
-  length = width = (cell_size)
-
-  This allows to go between coordinates and actual position.
-
-  Attributes:
-    grid_map (matrix of float32): The occupancy grid map cell data.
-    cell_threshold (float32):     The threshold to determine if a cell is
-                                  occupied or not.
-    cell_size (float32):          The unitless size that a single cell
-                                  (width and height) represents.
-    debug (bool):                 A variable to enable/disable debug outputs.
-  """
-
-  def __init__(self, _grid_map=[], _cell_threshold=0.5, _cell_size=1, _debug=0):
     """
-    The default constructor for class OccupancyGridMap.
+    A class to implement a simple occupancy grid map.
 
-    Args:
-      _grid_map (matrix of float32): A datamap to use as the gridmap.
-      _cell_threshold (float32):     The threshold for a cell being occupied
-      _cell_size (float32):          The unitless size of a cell's length and width.
-      _debug (bool):                 Whether debug outputs are enabled.
+    The occupancy grid is defined as a matrix of values. These values
+    represent the likelyhood that a grid cell is occupied or not.
+
+    Values between (0 - 1) indicate the value of occupancy. Within that
+    range, whether a cell is considered occupied, is dependant on a whether
+    it is greater than a certain threshold (cell_threshold).
+    If these values are out of a specific range, or specifically -1, they are
+    considered unknown or unvisited.
+
+    A cell is occupied if its value >= occupancy_threshold.
+
+    Each cell represents a physical square of area with a specified size:
+
+    length = width = (cell_size)
+
+    This allows to go between coordinates and actual position.
+
+    Attributes:
+        grid_map (matrix of float32): The occupancy grid map cell data.
+        cell_threshold (float32):     The threshold to determine if a cell is
+                                                                    occupied or not.
+        cell_size (float32):          The unitless size that a single cell
+                                                                    (width and height) represents.
+        debug (bool):                 A variable to enable/disable debug outputs.
     """
 
-    self.grid_map       = _grid_map
-    self.cell_threshold = _cell_threshold
-    self.cell_size      = _cell_size
-    self.debug          = _debug
+    def __init__(self, _grid_map=[], _cell_threshold=0.5, _cell_size=1, _debug=0):
+        """
+        The default constructor for class OccupancyGridMap.
 
-  # ----------------------------------------------------------------------------
-  # Class Methods
-  # ----------------------------------------------------------------------------
+        Args:
+            _grid_map (matrix of float32): A datamap to use as the gridmap.
+            _cell_threshold (float32):     The threshold for a cell being occupied
+            _cell_size (float32):          The unitless size of a cell's length and width.
+            _debug (bool):                 Whether debug outputs are enabled.
+        """
 
-  def getDataLoc(self, loc_point):
-    """
-    Method to get the occupancy value at a certain coordinate location.
+        self.grid_map       = _grid_map
+        self.cell_threshold = _cell_threshold
+        self.cell_size      = _cell_size
+        self.debug          = _debug
 
-    Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
+    # ----------------------------------------------------------------------------
+    # Class Methods
+    # ----------------------------------------------------------------------------
 
-    Returns:
-      value (float32): The value of occupancy.
-    """
+    def getDataLoc(self, loc_point):
+        """
+        Method to get the occupancy value at a certain coordinate location.
 
-    # Get the index of the given point
-    index_point = self.locToIndex(loc_point)
+        Args:
+            loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
 
-    # Get the value of occupancy
-    return self.getDataIndex(index_point)
+        Returns:
+            value (float32): The value of occupancy.
+        """
 
-  def getDataIndex(self, index_point):
-    """
-    Method to get the occupancy value at a certain index location.
+        # Get the index of the given point
+        index_point = self.locToIndex(loc_point)
 
-    Args:
-      index_point (tuple of int): An indexed point (x, y).
+        # Get the value of occupancy
+        return self.getDataIndex(index_point)
 
-    Returns:
-      value (float32): The value of occupancy.
-    """
+    def getDataIndex(self, index_point):
+        """
+        Method to get the occupancy value at a certain index location.
 
-    # Ensure the point is valid
-    if (not self.isValidIndexPoint(index_point)):
-      print("ERROR: Entered point is invalid!")
-      return -1 # CDL=> Should be exception thrown?
+        Args:
+            index_point (tuple of int): An indexed point (x, y).
 
-    # Get index point x,y
-    x, y = index_point
+        Returns:
+            value (float32): The value of occupancy.
+        """
 
-    # Get the value of occupancy
-    return self.grid_map[y][x]
+        # Ensure the point is valid
+        if (not self.isValidIndexPoint(index_point)):
+            print("ERROR: Entered point is invalid!")
+            return -1 # CDL=> Should be exception thrown?
 
-  def setDataLoc(self, loc_point, value):
-    """
-    Method to set the occupancy value at a certain coordinate location.
+        # Get index point x,y
+        x, y = index_point
 
-    Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
-      value (float32):              The value of occupancy to set.
+        # Get the value of occupancy
+        return self.grid_map[y][x]
 
-    Returns:
-      value (float32): The value of occupancy.
-    """
+    def setDataLoc(self, loc_point, value):
+        """
+        Method to set the occupancy value at a certain coordinate location.
 
-    # Get the index of the given point
-    index_point = self.locToIndex(loc_point)
+        Args:
+            loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
+            value (float32):              The value of occupancy to set.
 
-    # Set the occupancy value
-    return self.setDataIndex(index_point, value)
+        Returns:
+            value (float32): The value of occupancy.
+        """
 
+        # Get the index of the given point
+        index_point = self.locToIndex(loc_point)
 
-  def setDataIndex(self, index_point, value):
-    """
-    Method to set the occupancy value at a certain index location.
+        # Set the occupancy value
+        return self.setDataIndex(index_point, value)
 
-    Args:
-      index_point (tuple of int): An indexed point (x, y).
-      value (float32):            The value of occupancy to set.
 
-    Returns:
-      value (float32): The value of occupancy.
-    """
+    def setDataIndex(self, index_point, value):
+        """
+        Method to set the occupancy value at a certain index location.
 
-    # Ensure the point is valid
-    if (not self.isValidIndexPoint(index_point)):
-      print("ERROR: Entered point is invalid!")
-      return -1 # CDL=> Should be exception thrown?
+        Args:
+            index_point (tuple of int): An indexed point (x, y).
+            value (float32):            The value of occupancy to set.
 
-    # Get index point x,y
-    x, y = index_point
+        Returns:
+            value (float32): The value of occupancy.
+        """
 
-    # Set the occupancy value
-    self.grid_map[y][x] = value
+        # Ensure the point is valid
+        if (not self.isValidIndexPoint(index_point)):
+            print("ERROR: Entered point is invalid!")
+            return -1 # CDL=> Should be exception thrown?
 
-    return value
+        # Get index point x,y
+        x, y = index_point
 
-  def isOccupiedLoc(self, loc_point):
-    """
-    Method to check if coordinate point is occupied.
+        # Set the occupancy value
+        self.grid_map[y][x] = value
 
-    Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
+        return value
 
-    Returns:
-      status (bool): Whether the position is occupied.
-    """
+    def isOccupiedLoc(self, loc_point):
+        """
+        Method to check if coordinate point is occupied.
 
-    # Get the index of the given point
-    index_point = self.locToIndex(loc_point)
+        Args:
+            loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
 
-    # Get occupied status
-    return self.isOccupiedIndex(index_point)
+        Returns:
+            status (bool): Whether the position is occupied.
+        """
 
-  def isOccupiedIndex(self, index_point):
-    """
-    Method to check if index point is occupied.
+        # Get the index of the given point
+        index_point = self.locToIndex(loc_point)
 
-    Args:
-      index_point (tuple of int): An indexed point (x, y).
+        # Get occupied status
+        return self.isOccupiedIndex(index_point)
 
-    Returns:
-      status (bool): Whether the position is occupied.
-    """
+    def isOccupiedIndex(self, index_point):
+        """
+        Method to check if index point is occupied.
 
-    # Ensure the point is valid
-    if (not self.isValidIndexPoint(index_point)):
-      print("ERROR: Entered point is invalid!")
-      return -1 # CDL=> Should be exception thrown?
+        Args:
+            index_point (tuple of int): An indexed point (x, y).
 
-    # Get index point x,y
-    x, y = index_point
+        Returns:
+            status (bool): Whether the position is occupied.
+        """
 
-    # Get the occupancy value
-    value = self.grid_map[y][x]
+        # Ensure the point is valid
+        if (not self.isValidIndexPoint(index_point)):
+            print("ERROR: Entered point is invalid!")
+            return -1 # CDL=> Should be exception thrown?
 
-    # Get occupied status
-    return (self.cell_threshold <= value <= 1)
+        # Get index point x,y
+        x, y = index_point
 
-  def isUnoccupiedLoc(self, loc_point):
-    """
-    Method to check if coordinate point is unoccupied.
+        # Get the occupancy value
+        value = self.grid_map[y][x]
 
-    Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
+        # Get occupied status
+        return (self.cell_threshold <= value <= 1)
 
-    Returns:
-      status (bool): Whether the position is unoccupied.
-    """
+    def isUnoccupiedLoc(self, loc_point):
+        """
+        Method to check if coordinate point is unoccupied.
 
-    # Get the index of the given point
-    index_point = self.locToIndex(loc_point)
+        Args:
+            loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
 
-    # Get occupied status
-    return self.isUnoccupiedIndex(index_point)
+        Returns:
+            status (bool): Whether the position is unoccupied.
+        """
 
-  def isUnoccupiedIndex(self, index_point):
-    """
-    Method to check if index point is unoccupied.
+        # Get the index of the given point
+        index_point = self.locToIndex(loc_point)
 
-    Args:
-      index_point (tuple of int): An indexed point (x, y).
+        # Get occupied status
+        return self.isUnoccupiedIndex(index_point)
 
-    Returns:
-      status (bool): Whether the position is unoccupied.
-    """
+    def isUnoccupiedIndex(self, index_point):
+        """
+        Method to check if index point is unoccupied.
 
-    # Ensure the point is valid
-    if (not self.isValidIndexPoint(index_point)):
-      print("ERROR: Entered point is invalid!")
-      return -1 # CDL=> Should be exception thrown?
+        Args:
+            index_point (tuple of int): An indexed point (x, y).
 
-    # Get index point x,y
-    x, y = index_point
+        Returns:
+            status (bool): Whether the position is unoccupied.
+        """
 
-    # Get the occupancy value
-    value = self.grid_map[y][x]
+        # Ensure the point is valid
+        if (not self.isValidIndexPoint(index_point)):
+            print("ERROR: Entered point is invalid!")
+            return -1 # CDL=> Should be exception thrown?
 
-    # Get occupied status
-    return (0 <= value <= self.cell_threshold)
+        # Get index point x,y
+        x, y = index_point
 
-  def isUnknownLoc(self, loc_point):
-    """
-    Method to check if coordinate point is unknown.
+        # Get the occupancy value
+        value = self.grid_map[y][x]
 
-    Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
+        # Get occupied status
+        return (0 <= value <= self.cell_threshold)
 
-    Returns:
-      status (bool): Whether the position is unknown.
-    """
+    def isUnknownLoc(self, loc_point):
+        """
+        Method to check if coordinate point is unknown.
 
-    # If not occupied or unoccupied, then unknown
-    return not (self.isOccupiedLoc(loc_point) or self.isUnoccupiedLoc(loc_point))
+        Args:
+            loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
 
-  def isUnknownIndex(self, index_point):
-    """
-    Method to check if index point is unknown.
+        Returns:
+            status (bool): Whether the position is unknown.
+        """
 
-    Args:
-      index_point (tuple of int): An indexed point (x, y).
+        # If not occupied or unoccupied, then unknown
+        return not (self.isOccupiedLoc(loc_point) or self.isUnoccupiedLoc(loc_point))
 
-    Returns:
-      status (bool): Whether the position is unknown.
-    """
+    def isUnknownIndex(self, index_point):
+        """
+        Method to check if index point is unknown.
 
-    # If not occupied or unoccupied, then unknown
-    return not (self.isOccupiedIndex(index_point) or self.isUnoccupiedIndex(index_point))
+        Args:
+            index_point (tuple of int): An indexed point (x, y).
 
-  def isValidLocPoint(self, loc_point):
-    """
-    Method to check if coordinate point is valid.
+        Returns:
+            status (bool): Whether the position is unknown.
+        """
 
-    Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
+        # If not occupied or unoccupied, then unknown
+        return not (self.isOccupiedIndex(index_point) or self.isUnoccupiedIndex(index_point))
 
-    Returns:
-      status (bool): Whether the position is valid.
-    """
+    def isValidLocPoint(self, loc_point):
+        """
+        Method to check if coordinate point is valid.
 
-    # Get the index of the given point
-    index_point = self.locToIndex(loc_point)
+        Args:
+            loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
 
-    # Check if point is valid
-    return self.isValidIndexPoint(index_point)
+        Returns:
+            status (bool): Whether the position is valid.
+        """
 
+        # Get the index of the given point
+        index_point = self.locToIndex(loc_point)
 
-  def isValidIndexPoint(self, index_point):
-    """
-    Method to check if index point is valid.
+        # Check if point is valid
+        return self.isValidIndexPoint(index_point)
 
-    Args:
-      index_point (tuple of int): An indexed point (x, y).
+    def isValidIndexPoint(self, index_point):
+        """
+        Method to check if index point is valid.
 
-    Returns:
-      status (bool): Whether the position is valid.
-    """
+        Args:
+            index_point (tuple of int): An indexed point (x, y).
 
-    # Get index point x,y
-    x, y = index_point
+        Returns:
+            status (bool): Whether the position is valid.
+        """
 
-    # Ensure the point is valid # CDL=> Check if conditional works
-    return True
-           # ((x < 0) or
-           #  (y < 0) or
-           #  (np.size(self.grid_map, 1) <= x) or
-           #  (np.size(self.grid_map, 0) <= y))
+        # Get index point x,y
+        x, y = index_point
 
-  def locToIndex(self, loc_point):
-    """
-    Method to convert a coordinate point to an index point.
+        # Ensure the point is valid
+        return ((0 <= x < len(self.grid_map[0])) and
+                (0 <= y < len(self.grid_map)))
 
-    Args:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
+    def getMaxRow(self):
+        return len(self.grid_map)
 
-    Returns:
-      index_point (tuple of int): An indexed point (x, y).
-    """
+    def getMaxCol(self):
+        return len(self.grid_map[0])
 
-    return tuple(axis*self.cell_size for axis in loc_point)
+    def getMaxPoint(self):
+        return (self.getMaxCol(), self.getMaxRow())
 
+    def locToIndex(self, loc_point):
+        """
+        Method to convert a coordinate point to an index point.
 
-  def indexToLoc(self, index_point):
-    """
-    Method to check if index point is valid.
+        Args:
+            loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
 
-    Args:
-      index_point (tuple of int): An indexed point (x, y).
+        Returns:
+            index_point (tuple of int): An indexed point (x, y).
+        """
 
-    Returns:
-      loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
-    """
+        return tuple(axis*self.cell_size for axis in loc_point)
 
-    return tuple(int(round(axis/self.cell_size)) for axis in index_point)
+    def indexToLoc(self, index_point):
+        """
+        Method to check if index point is valid.
 
-  def visualizeGrid(self):
-    """
-    Method to visualize a map of data.
+        Args:
+            index_point (tuple of int): An indexed point (x, y).
 
-    Args: None # CDL=> Add any config settings?
-    # Add setting to plot occ/unocc/unknown OR heatmap?
+        Returns:
+            loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
+        """
 
-    Returns: None
-    """
+        return tuple(int(round(axis/self.cell_size)) for axis in index_point)
 
-    # Create discrete colormap
-    # Brown : Unknown
-    # Blue  : Unoccupied
-    # Green : Occupied
-    cmap = colors.ListedColormap(['brown', 'blue', 'green', 'brown'])
-    bounds = [-1000, 0, self.cell_threshold, 1, 1000]
-    norm = colors.BoundaryNorm(bounds, cmap.N)
+    def visualizeGrid(self):
+        """
+        Method to visualize a map of data.
 
-    # CDL=> Add title? Option to enable axis?
-    fig, ax = plt.subplots()
-    ax.imshow(self.grid_map, origin='lower', cmap=cmap, norm=norm)
+        Args: None # CDL=> Add any config settings?
+        # Add setting to plot occ/unocc/unknown OR heatmap?
 
-    plt.axis("off")
-    plt.show()
+        Returns: None
+        """
 
-  def fromCSV(self, filename):
-    """
-    Method to import a gridmap from a csv file.
+        # Create discrete colormap
+        # Brown : Unknown
+        # Blue  : Unoccupied
+        # Green : Occupied
+        cmap = colors.ListedColormap(['brown', 'blue', 'green', 'brown'])
+        bounds = [-1000, 0, self.cell_threshold, 1, 1000]
+        norm = colors.BoundaryNorm(bounds, cmap.N)
 
-    Note: This method overwrites current grid map!
+        # CDL=> Add title? Option to enable axis?
+        fig, ax = plt.subplots()
+        ax.imshow(self.grid_map, origin='lower', cmap=cmap, norm=norm)
 
-    Args:
-      filename (string): The file containing MxN csv data.
+        plt.axis("off")
+        plt.show()
 
-    Returns: None
-    """
-    with open(filename, 'r') as fd:
-      reader = csv.reader(fd)
-      self.grid_map = np.array(list(reader)).astype("float")
+    def fromCSV(self, filename):
+        """
+        Method to import a gridmap from a csv file.
 
-  def fromKeyframesCSV(self, filename):
-    """
-    Method to import a gridmap from a csv file of keyframe points.
+        Note: This method overwrites current grid map!
 
-    Note: This method overwrites current grid map!
+        Args:
+            filename (string): The file containing MxN csv data.
 
-    Args:
-      filename (string): The file containing csv point data.
+        Returns: None
+        """
+        with open(filename, 'r') as fd:
+            reader = csv.reader(fd)
+            self.grid_map = np.array(list(reader)).astype("float")
 
-    Returns: None
-    """
+    def fromKeyframesCSV(self, filename):
+        """
+        Method to import a gridmap from a csv file of keyframe points.
 
-    # 1.) Import the keyframe data
-    keyframes = np.genfromtxt(filename, delimiter=",")
+        Note: This method overwrites current grid map!
 
-    # 2.) Calculate scale factor for data CDL=> Make dynamic somehow
-    # Calculate the smallest distance between any two points out of (x,y) points
-    point_distances = pdist(keyframes, "euclidean")
-    d = np.diff(keyframes, axis=0)
-    segdists = np.sqrt((d ** 2).sum(axis=1))
-    avg_seq_dist = np.average(segdists)
-    min_dist = np.amin(point_distances)
-    avg_dist = np.average(point_distances)
-    keyframes = keyframes / 0.6
+        Args:
+            filename (string): The file containing csv point data.
 
-    # 3.) Find the max point to allocate gridmap
-    max_point = np.ceil(np.amax(keyframes, axis=0)).astype(int)
-    # Allocate array to max point size
-    self.grid_map = np.full(max_point, 0.6).transpose()
+        Returns: None
+        """
 
-    # 4.) Translate array of points to positive numbers
-    # Calculate minimum point
-    minValueX = np.amin(keyframes[:, 0])
-    minValueY = np.amin(keyframes[:, 1])
-    # Only translate dimension if smallest point is negative
-    if (minValueX < 0):
-      keyframes[:, 0] -= minValueX
-    if (minValueY < 0):
-      keyframes[:, 1] -= minValueY
+        # 1.) Import the keyframe data
+        keyframes = np.genfromtxt(filename, delimiter=",")
 
-    # 5.) Set keyframe nearest integer point to 0 (unoccupied)
-    for point in keyframes:
-      x_index = int(np.floor(point[0]))
-      y_index = int(np.floor(point[1]))
-      self.setDataIndex((x_index, y_index), 0)
+        # 2.) Calculate scale factor for data CDL=> Make dynamic somehow
+        # Calculate the smallest distance between any two points out of (x,y) points
+        point_distances = pdist(keyframes, "euclidean")
+        d = np.diff(keyframes, axis=0)
+        segdists = np.sqrt((d ** 2).sum(axis=1))
+        avg_seq_dist = np.average(segdists)
+        min_dist = np.amin(point_distances)
+        avg_dist = np.average(point_distances)
+        keyframes = keyframes / 0.6
+
+        # 3.) Find the max point to allocate gridmap
+        max_point = np.ceil(np.amax(keyframes, axis=0)).astype(int)
+        # Allocate array to max point size
+        self.grid_map = np.full(max_point, 0.6).transpose()
+
+        # 4.) Translate array of points to positive numbers
+        # Calculate minimum point
+        minValueX = np.amin(keyframes[:, 0])
+        minValueY = np.amin(keyframes[:, 1])
+        # Only translate dimension if smallest point is negative
+        if (minValueX < 0):
+            keyframes[:, 0] -= minValueX
+        if (minValueY < 0):
+            keyframes[:, 1] -= minValueY
+
+        # 5.) Set keyframe nearest integer point to 0 (unoccupied)
+        for point in keyframes:
+            x_index = int(np.floor(point[0]))
+            y_index = int(np.floor(point[1]))
+            self.setDataIndex((x_index, y_index), 0)
 
 # ------------------------------------------------------------------------------
 # End of class OccupancyGridMap
@@ -425,9 +429,14 @@ class OccupancyGridMap:
 
 # Main code for this file. Only run if this file is the top
 if __name__ == "__main__":
-  print("Loading map data")
-  ogm = OccupancyGridMap()
-  # ogm.fromCSV("Map.csv")
-  ogm.fromKeyframesCSV("../data/keyframes.csv")
-  print("Visualizing grid map data")
-  ogm.visualizeGrid()
+    print("Loading map data")
+    ogm = OccupancyGridMap()
+    # ogm.fromCSV("Map.csv")
+    ogm.fromKeyframesCSV("../data/keyframes.csv")
+    print("Visualizing grid map data")
+    print()
+    print("Max Col (x): ", ogm.getMaxCol())
+    print("Max Row (y): ", ogm.getMaxRow())
+    print("Max Point (x,y): ", ogm.getMaxPoint())
+
+    ogm.visualizeGrid()
