@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
 # Name           : AStarOCC.py
 # Date Created   : 2/26/2021
-# Author(s)      : Micheal Caracciolo, Chris Lloyd
+# Author(s)      : Micheal Caracciolo, Chris Lloyd, Owen Casciotti
 # Github Link    : https://github.com/michealcarac/VSLAM-Mapping
 # Description    : A* For Occupancy Map
 # Original Author: Nicholas Swift
