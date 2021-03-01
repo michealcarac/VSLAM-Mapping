@@ -3,7 +3,7 @@
 # Date Created   : 2/26/2021
 # Author(s)      : Micheal Caracciolo, Chris Lloyd, Owen Casciotti
 # Github Link    : https://github.com/michealcarac/VSLAM-Mapping
-# Description    : A* For Occupancy Map
+# Description    : A* For Occupancy Grid Map
 # Original Author: Nicholas Swift
 # Article on code: https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2
 # ------------------------------------------------------------------------------
@@ -121,35 +121,50 @@ def astar(map,start,end):
     return None
 
 if __name__ == "__main__":
-    # Until we can pull # of rows and columns
     ogm = OccupancyGridMap()
-    ogm.fromCSV("Map.csv")
+
+    # Get keyframe data from map file
+    print("Unpacking MSG file...")
+    unpack = Unpacker("../data/map.msg")
+    keyframes = unpack.extract_keyframe_data()
+    # Remove z axis data
+    keyframes = np.delete(keyframes, 2, 1)
+
+    # Create mapdata
+    print("Loading map data...")
+    ogm.fromMapMSGData(keyframes)
+    # ogm.fromCSV("Map.csv")
+    # ogm.fromKeyframesCSV("../data/keyframes.csv")
 
     print(ogm.grid_map)
     start = (1,0)
     #     row^ ^column
-    end =(25,10)
+    end =(20,7)
     #   row^ ^column
     line = astar(ogm,start,end)
     print(line)
 
-    # FROM VISUALIZE MAP
-    cmap = colors.ListedColormap(['brown', 'blue', 'green', 'brown'])
-    bounds = [-1000, 0, ogm.cell_threshold, 1, 1000]
-    norm = colors.BoundaryNorm(bounds, cmap.N)
-    fig, ax = plt.subplots()
-    ax.imshow(ogm.grid_map, origin='lower', cmap=cmap, norm=norm)
+    # FROM VISUALIZE MAP # CDL=> Removed for now
+    # cmap = colors.ListedColormap(['brown', 'blue', 'green', 'brown'])
+    # bounds = [-1000, 0, ogm.cell_threshold, 1, 1000]
+    # norm = colors.BoundaryNorm(bounds, cmap.N)
+    # fig, ax = plt.subplots()
+    # ax.imshow(ogm.grid_map, origin='lower', cmap=cmap, norm=norm)
     # When doing poorly formatted maps:
     #ax.imshow(ogm.grid_map, origin='lower', cmap=cmap, norm=norm, aspect='auto')
-    # To add A star points on map
-    markersize = 5
+
+    # Visualize gridmap
+    fig, ax = ogm.visualizeGrid()
+
+    # Add A star path points to map
+    markersize = 100 # Size of start and end points (5-100 is a good range)
     if line != None:
         for point in line:
             ax.scatter(point[1], point[0])
 
     ax.scatter(start[1],start[0],s=markersize)
     ax.scatter(end[1],end[0],s=markersize)
-    plt.show()
+    fig.show()
 
 
 
