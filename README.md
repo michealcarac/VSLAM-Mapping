@@ -21,6 +21,7 @@ Singular Board to feed power to Motors/Jetson, powered by 12V batteries
 ## Software:
 
 Tensorflow Version: ```2.3.1```
+
 Python 3.7 Packages:
 
 ```
