@@ -7,8 +7,9 @@ Deployed on a Nvidia Jetson AGX Xavier, an embedded computer, we are using VSLAM
 We will be using a single Nvidia Jetson AGX Xavier for the best possible inference time from the Reinforcement Model.
  
  
- ## Hardware Parts:
+ ## Hardware:
 ```
+Singular Wheelchair
 Jetson AGX Development Board
 Development Computer to install Jetson Jetpack SDK
 Usb Hub for Cameras
@@ -17,8 +18,9 @@ Two Motor controllers
 Singular Board to feed power to Motors/Jetson, powered by 12V batteries
 ```
 
-Tensorflow Version: ```2.3.1```
+## Software:
 
+Tensorflow Version: ```2.3.1```
 Python 3.7 Packages:
 
 ```
@@ -30,7 +32,8 @@ numpy
 scipy
 ```
 
-## Initial Setup:
+
+
 
 
 
