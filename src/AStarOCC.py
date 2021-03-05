@@ -49,18 +49,19 @@ def return_path(current_node):
 
     for i in range(len(path)-1):
         pos = path[i]
-        nextpos = path[i+1]
-        if nextpos[1]-pos[1] == 0:
-            if nextpos[0] > pos[0]:
+        next_pos = path[i+1]
+        if next_pos[1]-pos[1] == 0:
+            if next_pos[0] > pos[0]:
                 angle = 90
             else:
                 angle = 270
         else:
-            if nextpos[1] > pos[1]:
+            if next_pos[1] > pos[1]:
                 angle = 0
             else:
                 angle = 180
         path[i] = [pos[0],pos[1],angle]
+    path[-1] = [path[-1][0],path[-1][1],path[-2][2]]
     return path# Reversed path
 
 def astar(map,start,end):
@@ -108,7 +109,7 @@ def astar(map,start,end):
 
         for neighbor in near_squares:
             new_pos = (current_node.position[0] + neighbor[0], current_node.position[1] + neighbor[1])
-            if map.isValidIndexPoint(new_pos[::-1]): #Function takes in as X,Y
+            if map.isValidIndexPoint(new_pos[::-1]): #Function takes in as X,Y, so we flip from Y,X
                 if map.isUnoccupiedIndex(new_pos[::-1]): #Function takes in as X,Y
                     new_node = NodeStar(current_node, new_pos)
                     if not (new_node in open_list):
