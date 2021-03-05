@@ -14,10 +14,10 @@ matrix = ogm.grid_map
 grid = Grid(matrix=matrix)
 
 start = grid.node(0, 0)
-end = grid.node(7, 20)
+end = grid.node(20, 7)
 
 finder = AStarFinder(diagonal_movement=DiagonalMovement.never)
 path, runs = finder.find_path(start, end, grid)
-
-print('operations:', runs, 'path length:', len(path))
-print(grid.grid_str(path=path, start=start, end=end))
+print(path)
+#print('operations:', runs, 'path length:', len(path))
+#print(grid.grid_str(path=path, start=start, end=end))

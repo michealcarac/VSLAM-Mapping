@@ -5,7 +5,10 @@ from scipy.spatial.transform import Rotation as R
 
 
 class Unpacker:
-    def __init__(self, mapfile):
+    def __init__(self):
+        pass
+
+    def unpackMSGmap(self,mapfile):
         # USAGE: Takes in map file in form of .msg
         with open(mapfile, "rb") as msg_pack_file:
             msg_pack_byte_data = msg_pack_file.read()
