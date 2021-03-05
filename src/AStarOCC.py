@@ -41,10 +41,27 @@ class NodeStar:
 def return_path(current_node):
     path = []
     current = current_node
+    i = 0
     while current is not None:
         path.append(current.position)
         current = current.parent
-    return path[::-1]# Reversed path
+    path = path[::-1]
+
+    for i in range(len(path)-1):
+        pos = path[i]
+        nextpos = path[i+1]
+        if nextpos[1]-pos[1] == 0:
+            if nextpos[0] > pos[0]:
+                angle = 90
+            else:
+                angle = 270
+        else:
+            if nextpos[1] > pos[1]:
+                angle = 0
+            else:
+                angle = 180
+        path[i] = [pos[0],pos[1],angle]
+    return path# Reversed path
 
 def astar(map,start,end):
     # Create start and end nodes
