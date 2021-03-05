@@ -1,7 +1,8 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Import our custom modules
-from AStarOCC import NodeStar,return_path,astar
+from AStarOCC import astar
 from OccupancyGridMap import OccupancyGridMap
 from MapFileUnpacker import Unpacker
 
@@ -48,8 +49,17 @@ if __name__ == "__main__":
     markersize = 100 # Size of start and end points (5-100 is a good range)
     if line != None:
         for point in line:
-            ax.scatter(point[1], point[0])
+            ax.scatter(point[0], point[1])
 
     ax.scatter(start[1],start[0],s=markersize)
     ax.scatter(end[1],end[0],s=markersize)
     fig.show()
+
+    Realline = ogm.getRealLocations(line)
+
+
+    plt.figure()
+    for point in Realline:
+        plt.scatter(point[0],point[1])
+    plt.scatter(keyframes[:,0],keyframes[:,1])
+    plt.show()

@@ -234,6 +234,17 @@ class OccupancyGridMap:
         scaledPt = tuple(int(round(axis / self.cell_size)) for axis in loc_point)
         return (scaledPt[0] - self.trans_pt[0], scaledPt[1] - self.trans_pt[1])
 
+    def getRealLocations(self,path):
+        line = []
+        for coord in path:
+            x = coord[0]
+            y = coord[1]
+            theta = coord[2]
+            point = self.indexToLoc([x, y])
+            line.append([point[0], point[1], theta])
+
+        return line
+
     def indexToLoc(self, index_point):
         """
         Method to check if index point is valid.

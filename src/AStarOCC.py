@@ -43,20 +43,20 @@ def return_path(current_node):
     current = current_node
     i = 0
     while current is not None:
-        path.append(current.position)
+        path.append(current.position[::-1])
         current = current.parent
     path = path[::-1]
 
     for i in range(len(path)-1):
         pos = path[i]
         next_pos = path[i+1]
-        if next_pos[1]-pos[1] == 0:
-            if next_pos[0] > pos[0]:
+        if next_pos[0]-pos[0] == 0:
+            if next_pos[1] > pos[1]:
                 angle = 90
             else:
                 angle = 270
         else:
-            if next_pos[1] > pos[1]:
+            if next_pos[0] > pos[0]:
                 angle = 0
             else:
                 angle = 180
@@ -138,12 +138,16 @@ def astar(map,start,end):
 
     return None
 
+
+
+
 if __name__ == "__main__":
     ogm = OccupancyGridMap()
 
     # Get keyframe data from map file
     print("Unpacking MSG file...")
-    unpack = Unpacker("../data/map.msg")
+    unpack = Unpacker()
+    unpack.unpackMSGmap("../data/map.msg")
     keyframes = unpack.extract_keyframe_data()
     # Remove z axis data
     keyframes = np.delete(keyframes, 2, 1)
@@ -178,11 +182,12 @@ if __name__ == "__main__":
     markersize = 100 # Size of start and end points (5-100 is a good range)
     if line != None:
         for point in line:
-            ax.scatter(point[1], point[0])
+            ax.scatter(point[0], point[1])
 
     ax.scatter(start[1],start[0],s=markersize)
     ax.scatter(end[1],end[0],s=markersize)
+
     fig.show()
-
-
+    line2 = ogm.getRealLocations(line)
+    print(line2)
 
