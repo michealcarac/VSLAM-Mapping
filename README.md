@@ -26,7 +26,7 @@ Tensorflow Version: ```2.3.1```
 Python 3.7 Modules:
 ```
 csv
-cv2
+opencv-python [3.2]
 matplotlib
 msgpack
 numpy
