@@ -57,13 +57,19 @@ if __name__ == "__main__":
 
     Realline = ogm.getRealLocations(line)
 
-
+    Reallinexy = [] #realline without angle {temp until I can feed in the angle to ICP}
+    keyframesxy = []
     plt.figure()
-    plt.scatter(keyframes[:, 0], keyframes[:, 1])
     for point in Realline:
         plt.scatter(point[0],point[1])
+        Reallinexy.append([point[0],point[1]])
+    for point in keyframes:
+        plt.scatter(point[0], point[1], c='#1f77b4')
+        keyframesxy.append([point[0],point[1]])
     plt.show()
     print(keyframes)
+
+    # Plots lines between points
     for i in range(len(keyframes)-1):
         deltax = keyframes[i][0] - keyframes[i+1][0]
         deltay = keyframes[i][1] - keyframes[i+1][1]
@@ -71,5 +77,21 @@ if __name__ == "__main__":
             x_values = [keyframes[i][0],keyframes[i+1][0]]
             y_values = [keyframes[i][1], keyframes[i+1][1]]
             plt.plot(x_values,y_values)
-    print(Realline)
+    plt.show()
+
+    # TODO: MESSING WITH ICP
+    indices = ogm.ICP(keyframesxy, Realline)
+    path = []
+    for point in Realline:
+        plt.scatter(point[0],point[1])
+        Reallinexy.append([point[0],point[1]])
+    for point in keyframes:
+        plt.scatter(point[0], point[1], c='#1f77b4')
+        keyframesxy.append([point[0],point[1]])
+    for i in range(len(indices)):
+        x_values = [keyframes[indices[i]][0]]
+        y_values = [keyframes[indices[i]][1]]
+        path.append([x_values,y_values])
+        plt.scatter(x_values,y_values,c='#ff7f0e')
+    print(path)
     plt.show()

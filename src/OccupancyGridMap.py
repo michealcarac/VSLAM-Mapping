@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from matplotlib import colors
 import numpy as np
 import csv
+from typing import Tuple
 
 class OccupancyGridMap:
     """
@@ -231,19 +232,8 @@ class OccupancyGridMap:
         Returns:
             index_point (tuple of int): An indexed point (x, y).
         """
-        scaledPt = tuple(int(round(axis / self.cell_size)) for axis in loc_point)
+        scaledPt = list(int(round(axis / self.cell_size)) for axis in loc_point)
         return (scaledPt[0] - self.trans_pt[0], scaledPt[1] - self.trans_pt[1])
-
-    def getRealLocations(self,path):
-        line = []
-        for coord in path:
-            x = coord[0]
-            y = coord[1]
-            theta = coord[2]
-            point = self.indexToLoc([x, y])
-            line.append([point[0], point[1], theta])
-
-        return line
 
     def indexToLoc(self, index_point):
         """
@@ -256,7 +246,93 @@ class OccupancyGridMap:
             loc_point (tuple of float32): A real world point (x, y). Scaled by cell_threshold.
         """
         translatedPt = (index_point[0] + self.trans_pt[0], index_point[1] + self.trans_pt[1])
-        return tuple((axis * self.cell_size) for axis in translatedPt)
+        return list((axis * self.cell_size) for axis in translatedPt)
+
+    def getRealLocations(self,path):
+        """
+        Converts the index path to a real world coord path
+        Args:
+            path: Index Path of type List
+
+        Returns:
+
+        """
+        line = []
+        for coord in path:
+            x = coord[0]
+            y = coord[1]
+            theta = coord[2]
+            point = self.indexToLoc([x, y])
+            line.append([point[0], point[1], theta])
+
+        return line
+
+    def ICP(self,fixed,variable):
+        """
+        Method to run Iterative Closest Point Algorithm
+        Args:
+            fixed: Fixed Path (Control path) in real world coords
+            variable: Path that is fitted to Fixed Path in real world coords
+
+        Returns:
+            path: The Adjusted Path
+        """
+        print(fixed)
+        print(variable)
+        indices = []
+        dist_2 = []
+        nodes = np.asarray(fixed)
+        #for node in variable:
+        #    nodes = np.asarray(nodes)
+        #    nodexy = [node[0],node[1]]
+        #    print(node[2])
+        #    if node[2] == 90 or node[2] == 270:
+        #        print(node)
+        #        dist_2 = np.sum((nodes - [0,nodexy[1]])**2, axis=1)
+        #        print(dist_2)
+        #        indices.append(np.argmin(dist_2))
+        #    elif node[2] == 0 or node[2] == 180:
+        #        print(node)
+        #        dist_2 = np.sum((nodes - [nodexy[0],0])**2, axis=1)
+        #        print(dist_2)
+        #        indices.append(np.argmin(dist_2))
+        for index,node in enumerate(variable):  # To check every variable Point
+            if node[2] == 90 or node[2] == 270: # If going Vertical
+                for i in range(len(nodes)):     # To check for every fixed Point to every variable
+                    if nodes[i,1] - node[1] <= 0 and nodes[i,1] - node[1] >= -.2: #Must slightly be below variable point
+                        #print("value:", nodes[i,0],nodes[i,1],"difference:",nodes[i,1]-node[1])
+                        #print((nodes[i,0] - node[0])**2)
+                        #print(index)
+                        if abs((nodes[i,0]-node[0])) <1: # Tolerance for X values
+                            dist_2.append(abs((nodes[i,0] - node[0])**2)) #Append distance in X values to distance array
+                    else:
+                        dist_2.append(100000) # For garbage distances
+                    print(dist_2)
+
+                indices.append(np.argmin(dist_2)) # Append min distance index to indices array
+                dist_2 = [] # Resets distance array
+
+            elif node[2] == 0 or node[2] == 180: # If going Horizontal (TODO: THIS ONE NEEDS TO BE ADJUSTED)
+                for i in range(len(nodes)):
+                    if nodes[i,0] - node[0] <= 0 and nodes[i,0] - node[0] >= -.4: #Must slightly be right of variable pt (maybe?)
+                        if abs((nodes[i,1] - node[1])) < 1: # Tolerance for Y values
+                            dist_2.append(abs((nodes[i,1] - node[1])**2)) #Append distance in Y values to distance array
+                    else:
+                        dist_2.append(100000) # For garbage distances
+                indices.append(np.argmin(dist_2)) # Append min distance index to indices array
+                dist_2 = [] # Resets distance array
+
+
+
+        #for node in variable:
+        #    nodexy = [node[0],node[1]]
+        #    nodes = np.asarray(nodes)
+        #    print("difference:", (nodes-nodexy)**2)
+        #    dist_2 = np.sum((nodes - nodexy) ** 2, axis=1)
+        #    print(dist_2)
+        #    indices.append(np.argmin(dist_2))
+        print(indices)
+        return indices
 
     def visualizeGrid(self):
         """
