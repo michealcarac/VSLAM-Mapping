@@ -360,6 +360,15 @@ class OccupancyGridMap:
         plt.show()
         return fig, ax
 
+    def numpyArrayToCSV(self):
+        """
+        Method to make a csv file of occupancy grid map data from numpy array.
+
+        """
+        # save array into csv file
+        np.savetxt("/var/www/html/occupancy_map_data.csv", self.grid_map,
+                  delimiter=",")
+
 
     def fromCSV(self, filename):
         """
