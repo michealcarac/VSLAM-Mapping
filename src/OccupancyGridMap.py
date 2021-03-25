@@ -519,5 +519,8 @@ if __name__ == "__main__":
     print("Visualizing grid map data...")
     ogm.visualizeGrid()
 
+    # Create occupancy grid map data csv file KAB
+    # numpyArrayToCSV() # NOTE: added this for testing of function will not use until completely ready
+
     # Calculate the location (camera coordinates) of an index point
     print("(0,1): ", ogm.indexToLoc((0,1)))
