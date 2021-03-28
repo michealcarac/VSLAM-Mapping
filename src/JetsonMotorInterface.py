@@ -11,122 +11,153 @@
 # External Imports
 import RPi.GPIO as GPIO  # For interfacing with the Jetson GPIO
 import time              # CDL=> Needed?
+import keyboard  # using module keyboard
 
 # Jetson version (Change here for different boards)
 JETSON_BOARD_NAME = "NANO"  # AGX or NANO
 
-# Constants for direction and motor selection
-# Motor
-MOTOR_LEFT  = -1
-MOTOR_RIGHT = 1
-
-# Direction
-FORWARDS = 1
-STOP     = 0
-REVERSE  = -1
-
 # Pin Definitons: (BOARD pin notation)
 if (JETSON_BOARD_NAME == "NANO"):  # For Jetson Nano
-    L_MOTOR_DIR_PIN    = 38
-    L_MOTOR_EN_PIN     = 37
-    R_MOTOR_DIR_PIN    = 36
-    R_MOTOR_EN_PIN     = 35
-    JETSON_CTRL_PIN    = 32
-    THUMBSTICK_BTN_PIN = 31
+	FORWARDS_PIN    = 37
+	BACKWARDS_PIN   = 35
+	LEFT_PIN        = 38
+	RIGHT_PIN       = 36
+	JETSON_CTRL_PIN = 32
 elif (JETSON_BOARD_NAME == "AGX"):  # For Jetson AGX
-    # L_MOTOR_DIR_PIN    = CDL=> Find pin number
-    # L_MOTOR_EN_PIN     = CDL=> Find pin number
-    # R_MOTOR_DIR_PIN    = CDL=> Find pin number
-    # R_MOTOR_EN_PIN     = CDL=> Find pin number
-    # JETSON_CTRL_PIN    = CDL=> Find pin number
-    # THUMBSTICK_BTN_PIN = CDL=> Find pin number
+	# FORWARDS_PIN    = CDL=> Find pin number
+	# BACKWARDS_PIN   = CDL=> Find pin number
+	# LEFT_PIN        = CDL=> Find pin number
+	# RIGHT_PIN       = CDL=> Find pin number
+	# JETSON_CTRL_PIN = CDL=> Find pin number
 else
-    print("Unsupported Jetson board!")
-
-# Local variable to control whether the wheelchair is in
-# manual control mode (False) or Jetson control mode (True)
-jetsonCtrlEn = GPIO.LOW
-
-# Invert control enabled
-def invertCtrl():
-    jetsonCtrlEn = not jetsonCtrlEn
-    GPIO.output(JETSON_CTRL_PIN, jetsonCtrlEn)
+	print("Unsupported Jetson board!")
 
 def initPins():
-    """
-    Setup the Jetson GPIO pins for motor control.
-    """
-    GPIO.setmode(GPIO.BOARD)                  # BOARD pin-numbering scheme
-    GPIO.setup(L_MOTOR_DIR_PIN,    GPIO.OUT)
-    GPIO.setup(L_MOTOR_EN_PIN,     GPIO.OUT)
-    GPIO.setup(R_MOTOR_DIR_PIN,    GPIO.OUT)
-    GPIO.setup(R_MOTOR_EN_PIN,     GPIO.OUT)
-    GPIO.setup(JETSON_CTRL_PIN,    GPIO.OUT)
-    GPIO.setup(THUMBSTICK_BTN_PIN, GPIO.IN)
-    GPIO.add_event_detect(THUMBSTICK_BTN_PIN,
-                          GPIO.FALLING,
-                          callback=invertCtrl,
-                          bouncetime=10)
-    GPIO.output(JETSON_CTRL_PIN, jetsonCtrlEn)
-    stopMotors()                              # Init with motors stopped
-
-def move(direction, motor):
-    """
-    Move a motor (motor) in a certain direction (direction).
-
-    Arguments:
-        motor     (int): The motor you want to control.
-                         (MOTOR_LEFT) or (MOTOR_RIGHT).
-        direction (int): The direction you want to move.
-                         (FORWARDS), (STOP) or (REVERSE).
-    """
-    if (jetsonCtrlEn):
-        dirPin = L_MOTOR_DIR_PIN if (motor == MOTOR_LEFT) else R_MOTOR_DIR_PIN
-        enPin  = L_MOTOR_EN_PIN  if (motor == MOTOR_LEFT) else R_MOTOR_EN_PIN
-
-        dirVal = GPIO.HIGH if (direction == FORWARDS) else GPIO.LOW
-        enVal  = GPIO.LOW if (direction == STOP) else GPIO.HIGH
-
-        GPIO.output(dirPin, dirVal)  # Change direction (forwards/back)
-        GPIO.output(enPin,  enVal)   # Enable/disable motor (moving/stopped)
-    else:
-        print("In manual control. Can't control motors from Jetson!")
+	"""
+	Setup the Jetson GPIO pins for motor control.
+	"""
+	GPIO.setmode(GPIO.BOARD)                  # BOARD pin-numbering scheme
+	GPIO.setup(FORWARDS_PIN,    GPIO.OUT)     # Setup forwards pin as output
+	GPIO.setup(BACKWARDS_PIN,   GPIO.OUT)     # Setup backwards pin as output
+	GPIO.setup(LEFT_PIN,        GPIO.OUT)     # Setup left pin as output
+	GPIO.setup(RIGHT_PIN,       GPIO.OUT)     # Setup right pin as output
+	GPIO.setup(JETSON_CTRL_PIN, GPIO.IN)      # Setup ctrl pin as input
+	stopMotors()                              # Init with motors stopped
 
 # ------------------------------------------------------------------------------
 # High level user control of motors
 # ------------------------------------------------------------------------------
 def stopMotors():
-    move(STOP, MOTOR_LEFT)
-    move(STOP, MOTOR_RIGHT)
+	gpio.output(FORWARDS_PIN,  GPIO.LOW)
+	gpio.output(BACKWARDS_PIN, GPIO.LOW)
+	gpio.output(LEFT_PIN,      GPIO.LOW)
+	gpio.output(RIGHT_PIN,     GPIO.LOW)
 
 def goForwards():
-    move(FORWARDS, MOTOR_LEFT)
-    move(FORWARDS, MOTOR_RIGHT)
+	gpio.output(FORWARDS_PIN,  GPIO.HIGH)
+	gpio.output(BACKWARDS_PIN, GPIO.LOW)
+	gpio.output(LEFT_PIN,      GPIO.LOW)
+	gpio.output(RIGHT_PIN,     GPIO.LOW)
 
 def goBackwards():
-    move(BACKWARDS, MOTOR_LEFT)
-    move(BACKWARDS, MOTOR_RIGHT)
+	gpio.output(FORWARDS_PIN,  GPIO.LOW)
+	gpio.output(BACKWARDS_PIN, GPIO.HIGH)
+	gpio.output(LEFT_PIN,      GPIO.LOW)
+	gpio.output(RIGHT_PIN,     GPIO.LOW)
 
-def turnLeft():
-    move(BACKWARDS, MOTOR_LEFT)
-    move(FORWARDS,  MOTOR_RIGHT)
+def goLeft():
+	gpio.output(FORWARDS_PIN,  GPIO.LOW)
+	gpio.output(BACKWARDS_PIN, GPIO.LOW)
+	gpio.output(LEFT_PIN,      GPIO.HIGH)
+	gpio.output(RIGHT_PIN,     GPIO.LOW)
 
-def turnRight():
-    move(FORWARDS,  MOTOR_LEFT)
-    move(BACKWARDS, MOTOR_RIGHT)
+def goRight():
+	gpio.output(FORWARDS_PIN,  GPIO.LOW)
+	gpio.output(BACKWARDS_PIN, GPIO.LOW)
+	gpio.output(LEFT_PIN,      GPIO.LOW)
+	gpio.output(RIGHT_PIN,     GPIO.HIGH)
+
+w_pressed = False
+a_pressed = False
+s_pressed = False
+d_pressed = False
+
+def key_pressed(key):
+	global w_pressed
+	global a_pressed
+	global s_pressed
+	global d_pressed
+	if   key.name == 'w' and not w_pressed:
+		w_pressed = True
+		goForwards()
+		# print("w pressed")
+	elif key.name == 'a' and not a_pressed:
+		a_pressed = True
+		goBackwards()
+		# print("a pressed")
+	elif key.name == 's' and not s_pressed:
+		s_pressed = True
+		goLeft()
+		# print("s pressed")
+	elif key.name == 'd' and not d_pressed:
+		d_pressed = True
+		goRight()
+		# print("d pressed")
+
+def key_released(key):
+	global w_pressed
+	global a_pressed
+	global s_pressed
+	global d_pressed
+	if   key.name == 'w':
+		w_pressed = False
+		stopMotors()
+		# print("w released")
+	elif key.name == 'a':
+		a_pressed = False
+		stopMotors()
+		# print("a released")
+	elif key.name == 's':
+		s_pressed = False
+		stopMotors()
+		# print("s released")
+	elif key.name == 'd':
+		d_pressed = False
+		stopMotors()
+		# print("d released")
+
+def main_input():
+	keyboard.on_press_key(  'w',   key_pressed)
+	keyboard.on_press_key(  'a',   key_pressed)
+	keyboard.on_press_key(  's',   key_pressed)
+	keyboard.on_press_key(  'd',   key_pressed)
+	keyboard.on_release_key('w',   key_released)
+	keyboard.on_release_key('a',   key_released)
+	keyboard.on_release_key('s',   key_released)
+	keyboard.on_release_key('d',   key_released)
+	try:
+		while(True):
+			continue
+	except:
+		print("Exiting")
+	finally:
+		keyboard.unhook_all()
+		GPIO.cleanup()
 
 # Main code for this file. Only runs if this file is the top file
 if __name__ == "__main__":
-    print("Init GPIO interface")
-    initPins()
+	print("Init GPIO interface")
+	initPins()
 
-    print("Moving forwards for 5 seconds!")
-    goForwards()
-    time.sleep(5)
+	main_input()
 
-    print("Rotate left for 5 seconds!")
-    turnLeft()
-    time.sleep(5)
+	# print("Moving forwards for 5 seconds!")
+	# goForwards()
+	# time.sleep(5)
 
-    print("Stop motors!")
-    stopMotors()
+	# print("Rotate left for 5 seconds!")
+	# goLeft()
+	# time.sleep(5)
+
+	# print("Stop motors!")
+	# stopMotors()
