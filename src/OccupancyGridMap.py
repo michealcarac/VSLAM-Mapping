@@ -417,7 +417,7 @@ class OccupancyGridMap:
         # 2.) If an unoccupied grid tile has an unoccupied corner tile, there
         #     is an adjacent unoccupied tile to both the current tile and the
         #     corner tile of interest.
-        scale_adjustment = 0.1
+        scale_adjustment = 0.01
         scale = 0
         notdone = True
         while notdone: # While the gridmap is not valid
@@ -426,11 +426,6 @@ class OccupancyGridMap:
 
             # Save the scale for further use
             self.cell_size = scale
-
-            # Find the max point to allocate gridmap
-            max_point = np.ceil(np.amax(scaledKeyframes, axis=0)).astype(int)
-            # Allocate array to max point size
-            self.grid_map = np.full(max_point, 0.6).transpose()
 
             # Translate array of points to positive numbers
             # Calculate minimum point
@@ -445,6 +440,11 @@ class OccupancyGridMap:
 
             # Save the translation point for further use
             self.trans_pt = (minValueX, minValueY)
+
+            # Find the max point to allocate gridmap
+            max_point = np.ceil(np.amax(scaledKeyframes, axis=0)).astype(int)
+            # Allocate array to max point size
+            self.grid_map = np.full(max_point, 0.6).transpose()
 
             # Set keyframe nearest integer point to 0 (unoccupied)
             for point in scaledKeyframes:
