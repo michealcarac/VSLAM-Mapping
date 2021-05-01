@@ -1,15 +1,15 @@
 # ------------------------------------------------------------------------------
 # Name         : JetsonMotorInterface.py
 # Date Created : 2/22/2021
-# Author(s)    : Micheal Caracciolo, Chris Lloyd, Owen Casciotti
+# Author(s)    : Chris Lloyd, Micheal Caracciolo, Owen Casciotti
 # Github Link  : https://github.com/michealcarac/VSLAM-Mapping
-# Description  : A class to control a STM (CDL=> Add model here) microcontroller
-#                Controlling two stepper motors with individual (CDL=>
-#                Add Motor controller model here) motor controller boards.
+# Description  : A class to control an Arduino microcontroller controlling two
+#                stepper motors with individual (CDL=>Add Motor controller model
+#                here) motor controller boards.
 # ------------------------------------------------------------------------------
 
 # External Imports
-import RPi.GPIO as GPIO  # For interfacing with the Jetson GPIO
+import RPI.GPIO as GPIO  # For interfacing with the Jetson GPIO
 import time              # CDL=> Needed?
 import keyboard  # using module keyboard
 
@@ -22,14 +22,14 @@ if (JETSON_BOARD_NAME == "NANO"):  # For Jetson Nano
 	BACKWARDS_PIN   = 35
 	LEFT_PIN        = 38
 	RIGHT_PIN       = 36
-	JETSON_CTRL_PIN = 32
+	# JETSON_CTRL_PIN = 32  // CDL=> Not needed
 elif (JETSON_BOARD_NAME == "AGX"):  # For Jetson AGX
 	# FORWARDS_PIN    = CDL=> Find pin number
 	# BACKWARDS_PIN   = CDL=> Find pin number
 	# LEFT_PIN        = CDL=> Find pin number
 	# RIGHT_PIN       = CDL=> Find pin number
-	# JETSON_CTRL_PIN = CDL=> Find pin number
-else
+	# JETSON_CTRL_PIN = CDL=> Find pin number  // CDL=> Not needed
+else:
 	print("Unsupported Jetson board!")
 
 def initPins():
@@ -41,42 +41,43 @@ def initPins():
 	GPIO.setup(BACKWARDS_PIN,   GPIO.OUT)     # Setup backwards pin as output
 	GPIO.setup(LEFT_PIN,        GPIO.OUT)     # Setup left pin as output
 	GPIO.setup(RIGHT_PIN,       GPIO.OUT)     # Setup right pin as output
-	GPIO.setup(JETSON_CTRL_PIN, GPIO.IN)      # Setup ctrl pin as input
+	# GPIO.setup(JETSON_CTRL_PIN, GPIO.IN)      # Setup ctrl pin as input  // CDL=> Not needed
 	stopMotors()                              # Init with motors stopped
 
 # ------------------------------------------------------------------------------
 # High level user control of motors
 # ------------------------------------------------------------------------------
 def stopMotors():
-	gpio.output(FORWARDS_PIN,  GPIO.LOW)
-	gpio.output(BACKWARDS_PIN, GPIO.LOW)
-	gpio.output(LEFT_PIN,      GPIO.LOW)
-	gpio.output(RIGHT_PIN,     GPIO.LOW)
+	gpio.output(FORWARDS_PIN,  GPIO.HIGH)
+	gpio.output(BACKWARDS_PIN, GPIO.HIGH)
+	gpio.output(LEFT_PIN,      GPIO.HIGH)
+	gpio.output(RIGHT_PIN,     GPIO.HIGH)
 
 def goForwards():
-	gpio.output(FORWARDS_PIN,  GPIO.HIGH)
-	gpio.output(BACKWARDS_PIN, GPIO.LOW)
-	gpio.output(LEFT_PIN,      GPIO.LOW)
-	gpio.output(RIGHT_PIN,     GPIO.LOW)
-
-def goBackwards():
 	gpio.output(FORWARDS_PIN,  GPIO.LOW)
 	gpio.output(BACKWARDS_PIN, GPIO.HIGH)
-	gpio.output(LEFT_PIN,      GPIO.LOW)
-	gpio.output(RIGHT_PIN,     GPIO.LOW)
+	gpio.output(LEFT_PIN,      GPIO.HIGH)
+	gpio.output(RIGHT_PIN,     GPIO.HIGH)
 
-def goLeft():
-	gpio.output(FORWARDS_PIN,  GPIO.LOW)
+def goBackwards():
+	gpio.output(FORWARDS_PIN,  GPIO.HIGH)
 	gpio.output(BACKWARDS_PIN, GPIO.LOW)
 	gpio.output(LEFT_PIN,      GPIO.HIGH)
-	gpio.output(RIGHT_PIN,     GPIO.LOW)
+	gpio.output(RIGHT_PIN,     GPIO.HIGH)
 
-def goRight():
-	gpio.output(FORWARDS_PIN,  GPIO.LOW)
-	gpio.output(BACKWARDS_PIN, GPIO.LOW)
+def goLeft():
+	gpio.output(FORWARDS_PIN,  GPIO.HIGH)
+	gpio.output(BACKWARDS_PIN, GPIO.HIGH)
 	gpio.output(LEFT_PIN,      GPIO.LOW)
 	gpio.output(RIGHT_PIN,     GPIO.HIGH)
 
+def goRight():
+	gpio.output(FORWARDS_PIN,  GPIO.HIGH)
+	gpio.output(BACKWARDS_PIN, GPIO.HIGH)
+	gpio.output(LEFT_PIN,      GPIO.HIGH)
+	gpio.output(RIGHT_PIN,     GPIO.LOW)
+
+# Keyboard stuff
 w_pressed = False
 a_pressed = False
 s_pressed = False
