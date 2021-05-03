@@ -1,97 +1,69 @@
 import numpy as np
-import matplotlib.pyplot as plt
-
-# Import our custom modules
 from AStarOCC import astar
 from OccupancyGridMap import OccupancyGridMap
 from MapFileUnpacker import Unpacker
+from send_location import send_live_location
 
+unpacker = Unpacker()
+occ_map = OccupancyGridMap()
+map_file = '../../ECELAB_V2_map.msg'
 
-if __name__ == "__main__":
-    # Initialize Objects
-    ogm = OccupancyGridMap()
-    unpack = Unpacker()
+# Steps
 
-    # Get keyframe data from map file (.msg)
-    print("Unpacking MSG file...")
-    unpack.unpackMSGmap("../data/map.msg")
-    keyframes = unpack.extract_keyframe_data()
-    # Remove z axis data
-    keyframes = np.delete(keyframes, 2, 1)
+# 1. Extract Keyframes
+    # Python file
+unpacker.unpackMSGmap(map_file)
+keyframes = unpacker.extract_keyframe_data()
+p = np.deg2rad(12.5)
+for i in range(len(keyframes)):
+    keyframes[i][0] = keyframes[i][0] * np.cos(p) - keyframes[i][1] * np.sin(p)
+    keyframes[i][1] = keyframes[i][0] * np.sin(p) + keyframes[i][1] * np.cos(p)
+    keyframes[i][2] = keyframes[i][2]
 
-    # Create mapdata
-    print("Loading map data...")
-    ogm.fromMapMSGData(keyframes)
-    # ogm.fromCSV("Map.csv")
-    # ogm.fromKeyframesCSV("../data/keyframes.csv")
+# Remove z axis data
+keyframes = np.delete(keyframes, 2, 1)
 
-    print(ogm.grid_map)
-    start = (0,0)
-    #     row^ ^column
-    end =(20,7)
-    #   row^ ^column
-    line = astar(ogm,start,end)
-    print(line)
+# 2. Generate OCC Map
+    # Python file
+occ_map.fromMapMSGData(keyframes)
 
-    # FROM VISUALIZE MAP # CDL=> Removed for now
-    # cmap = colors.ListedColormap(['brown', 'blue', 'green', 'brown'])
-    # bounds = [-1000, 0, ogm.cell_threshold, 1, 1000]
-    # norm = colors.BoundaryNorm(bounds, cmap.N)
-    # fig, ax = plt.subplots()
-    # ax.imshow(ogm.grid_map, origin='lower', cmap=cmap, norm=norm)
-    # When doing poorly formatted maps:
-    #ax.imshow(ogm.grid_map, origin='lower', cmap=cmap, norm=norm, aspect='auto')
+# 3. Use VSLAM Localization
+    # C File
+local_point = [0,0]
 
-    # Visualize gridmap
-    fig, ax = ogm.visualizeGrid()
+# 4. Find start on OCC
+    # Python File
 
-    # Add A star path points to map
-    markersize = 100 # Size of start and end points (5-100 is a good range)
-    if line != None:
-        for point in line:
-            ax.scatter(point[0], point[1])
+#start = occ_map.locToIndex(local_point)
+start = [5,4] #Test Variable
 
-    ax.scatter(start[1],start[0],s=markersize)
-    ax.scatter(end[1],end[0],s=markersize)
-    fig.show()
+# 5. Send OCC + start to android
+    # Python File
+    # Only first loop
 
-    Realline = ogm.getRealLocations(line)
+#Uncomment when On jetson
+#occ_map.numpyArrayToCSV()
+#send_live_location(start)
 
-    Reallinexy = [] #realline without angle {temp until I can feed in the angle to ICP}
-    keyframesxy = []
-    plt.figure()
-    for point in Realline:
-        plt.scatter(point[0],point[1])
-        Reallinexy.append([point[0],point[1]])
-    for point in keyframes:
-        plt.scatter(point[0], point[1], c='#1f77b4')
-        keyframesxy.append([point[0],point[1]])
-    plt.show()
-    print(keyframes)
+# 8. Follow A* path and send to android
+    # Python File
+path = None # read from path.csv
+pos1 = path[0]
+pos2 = path[1]
+# Move Forward
+curr = occ_map.locToIndex(local_point)
+while curr[0] != pos1[0] and curr[1] != pos1[1]:
+    # Call motor move forward
+    pass
+if pos1[2] == pos2[2]:
+    pass
+elif pos1[2] < pos2[2]:
+    pass
+    # Call motor turn left
+elif pos1[2] > pos2[2]:
+    pass
+    # Call motor turn right
 
-    # Plots lines between points
-    for i in range(len(keyframes)-1):
-        deltax = keyframes[i][0] - keyframes[i+1][0]
-        deltay = keyframes[i][1] - keyframes[i+1][1]
-        if abs(deltax) <= 2 and abs(deltay) <= 2:
-            x_values = [keyframes[i][0],keyframes[i+1][0]]
-            y_values = [keyframes[i][1], keyframes[i+1][1]]
-            plt.plot(x_values,y_values)
-    plt.show()
+# 9. Repeat back to 3, skip 5 and 6
+    # Python File
 
-    # TODO: MESSING WITH ICP
-    indices = ogm.ICP(keyframesxy, Realline)
-    path = []
-    for point in Realline:
-        plt.scatter(point[0],point[1])
-        Reallinexy.append([point[0],point[1]])
-    for point in keyframes:
-        plt.scatter(point[0], point[1], c='#1f77b4')
-        keyframesxy.append([point[0],point[1]])
-    for i in range(len(indices)):
-        x_values = [keyframes[indices[i]][0]]
-        y_values = [keyframes[indices[i]][1]]
-        path.append([x_values,y_values])
-        plt.scatter(x_values,y_values,c='#ff7f0e')
-    print(path)
-    plt.show()
