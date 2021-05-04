@@ -15,9 +15,10 @@ if __name__ == "__main__":
 
     # Get keyframe data from map file (.msg)
     print("Unpacking MSG file...")
-    unpack.unpackMSGmap("../../ECELAB_V2_map.msg")
+    unpack.unpackMSGmap("../data/map.msg")
     keyframes = unpack.extract_keyframe_data()
-
+    
+    t = 0 #Set 1 if need rotation
     p = np.deg2rad(12.5) #Rotation value
     #rotate around x
     #for i in range(len(keyframes)):
@@ -30,11 +31,12 @@ if __name__ == "__main__":
     #    keyframes[i][1] = keyframes[i][1]
     #    keyframes[i][2] = keyframes[i][2] * np.cos(p) - keyframes[i][0] * np.sin(p)
 #
-    #Rotate around z
-    for i in range(len(keyframes)):
-        keyframes[i][0] = keyframes[i][0] * np.cos(p) - keyframes[i][1] * np.sin(p)
-        keyframes[i][1] = keyframes[i][0] * np.sin(p) + keyframes[i][1] * np.cos(p)
-        keyframes[i][2] = keyframes[i][2]
+    if t == 1:
+        #Rotate around z
+        for i in range(len(keyframes)):
+            keyframes[i][0] = keyframes[i][0] * np.cos(p) - keyframes[i][1] * np.sin(p)
+            keyframes[i][1] = keyframes[i][0] * np.sin(p) + keyframes[i][1] * np.cos(p)
+            keyframes[i][2] = keyframes[i][2]
 
     # Remove z axis data
     keyframes = np.delete(keyframes, 2, 1)
@@ -46,9 +48,9 @@ if __name__ == "__main__":
     # ogm.fromKeyframesCSV("../data/keyframes.csv")
 
     print(ogm.grid_map)
-    start = (2,4)
+    start = (7,20)
     #     row^ ^column
-    end =(1,7)
+    end =(0,0)
     #   row^ ^column
     line = astar(ogm,start,end)
     print(line)
