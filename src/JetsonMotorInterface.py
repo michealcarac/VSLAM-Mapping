@@ -14,7 +14,7 @@ import time              # CDL=> Needed?
 import keyboard  # using module keyboard
 
 # Jetson version (Change here for different boards)
-JETSON_BOARD_NAME = "NANO"  # AGX or NANO
+JETSON_BOARD_NAME = "AGX"  # AGX or NANO
 
 # Pin Definitons: (BOARD pin notation)
 if (JETSON_BOARD_NAME == "NANO"):  # For Jetson Nano
@@ -24,11 +24,10 @@ if (JETSON_BOARD_NAME == "NANO"):  # For Jetson Nano
 	RIGHT_PIN       = 36
 	# JETSON_CTRL_PIN = 32  // CDL=> Not needed
 elif (JETSON_BOARD_NAME == "AGX"):  # For Jetson AGX
-	pass
-	# FORWARDS_PIN    = CDL=> Find pin number
-	# BACKWARDS_PIN   = CDL=> Find pin number
-	# LEFT_PIN        = CDL=> Find pin number
-	# RIGHT_PIN       = CDL=> Find pin number
+	FORWARDS_PIN    = 20 # CDL=> Fill these numbers in
+	BACKWARDS_PIN   = 20 # CDL=> Fill these numbers in
+	LEFT_PIN        = 20 # CDL=> Fill these numbers in
+	RIGHT_PIN       = 20 # CDL=> Fill these numbers in
 	# JETSON_CTRL_PIN = CDL=> Find pin number  // CDL=> Not needed
 else:
 	print("Unsupported Jetson board!")
