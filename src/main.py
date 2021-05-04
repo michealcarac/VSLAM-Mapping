@@ -3,67 +3,82 @@ from AStarOCC import astar
 from OccupancyGridMap import OccupancyGridMap
 from MapFileUnpacker import Unpacker
 from send_location import send_live_location
+# from JetsonMotorInterface import *
+import time
 
 unpacker = Unpacker()
 occ_map = OccupancyGridMap()
-map_file = '../../ECELAB_V2_map.msg'
+map_file = '../data/map.msg'
+sleep_time_forward = 1
+sleep_time_turn = 1
 
 # Steps
 
 # 1. Extract Keyframes
-    # Python file
+# Python file
 unpacker.unpackMSGmap(map_file)
 keyframes = unpacker.extract_keyframe_data()
-p = np.deg2rad(12.5)
-for i in range(len(keyframes)):
-    keyframes[i][0] = keyframes[i][0] * np.cos(p) - keyframes[i][1] * np.sin(p)
-    keyframes[i][1] = keyframes[i][0] * np.sin(p) + keyframes[i][1] * np.cos(p)
-    keyframes[i][2] = keyframes[i][2]
+# p = np.deg2rad(12.5)
+# for i in range(len(keyframes)):
+#     keyframes[i][0] = keyframes[i][0] * np.cos(p) - keyframes[i][1] * np.sin(p)
+#     keyframes[i][1] = keyframes[i][0] * np.sin(p) + keyframes[i][1] * np.cos(p)
+#     keyframes[i][2] = keyframes[i][2]
 
 # Remove z axis data
 keyframes = np.delete(keyframes, 2, 1)
 
 # 2. Generate OCC Map
-    # Python file
+# Python file
 occ_map.fromMapMSGData(keyframes)
 
-# 3. Use VSLAM Localization
-    # C File
-local_point = [0,0]
-
 # 4. Find start on OCC
-    # Python File
+# Python File
+start = (0, 1)  # Col, Row (x, y)
 
-#start = occ_map.locToIndex(local_point)
-start = [5,4] #Test Variable
 
 # 5. Send OCC + start to android
-    # Python File
-    # Only first loop
+# Python File
+# Uncomment when On jetson
+# occ_map.numpyArrayToCSV("/var/www/html/occupancy_map_data.csv")
+# send_live_location(start)
 
-#Uncomment when On jetson
-#occ_map.numpyArrayToCSV()
-#send_live_location(start)
+def main(end = None)
 
-# 8. Follow A* path and send to android
-    # Python File
-path = None # read from path.csv
-pos1 = path[0]
-pos2 = path[1]
-# Move Forward
-curr = occ_map.locToIndex(local_point)
-while curr[0] != pos1[0] and curr[1] != pos1[1]:
-    # Call motor move forward
-    pass
-if pos1[2] == pos2[2]:
-    pass
-elif pos1[2] < pos2[2]:
-    pass
-    # Call motor turn left
-elif pos1[2] > pos2[2]:
-    pass
-    # Call motor turn right
+    # 6. Get end location from android
+    if end == None:
+        end = (7, 20)
 
-# 9. Repeat back to 3, skip 5 and 6
-    # Python File
+    #7. Run A* and save path
+    path = astar(occ_map, start, end)
+
+    # 8. Follow A* path and send to android
+        # Python File
+    # initPins()
+    print('Starting')
+    for i in range(len(path)-1):
+        pos1 = path[i]
+        pos2 = path[i+1]
+        print(i, pos1, pos2)
+        send_live_location(pos2)
+        # Move Forward
+        if pos2[0] != pos1[0] or pos2[1] != pos1[1]:
+            # Call motor move forward
+            # goForwards()
+            print('Forward')
+            time.sleep(sleep_time_forward)
+
+        if pos1[2] == pos2[2]:
+            pass
+        elif pos1[2] < pos2[2]:
+            # Call motor turn left
+            # goLeft()
+            print('Left')
+            time.sleep(sleep_time_turn)
+
+        elif pos1[2] > pos2[2]:
+            # Call motor turn right
+            # goRight()
+            print('Right')
+            time.sleep(sleep_time_turn)
+
 

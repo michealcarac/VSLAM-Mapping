@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
 # Name           : AStarOCC.py
 # Date Created   : 2/26/2021
-# Author(s)      : Micheal Caracciolo, Chris Lloyd, Owen Casciotti
+# Author(s)      : Micheal Caracciolo, Chris Lloyd
 # Github Link    : https://github.com/michealcarac/VSLAM-Mapping
-# Description    : A* For Occupancy Grid Map
+# Description    : A* For Occupancy Map
 # Original Author: Nicholas Swift
 # Article on code: https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2
 # ------------------------------------------------------------------------------
@@ -45,6 +45,7 @@ def return_path(current_node):
     while current is not None:
         path.append(current.position[::-1])
         current = current.parent
+
     path = path[::-1]
 
     for i in range(len(path)-1):
@@ -62,9 +63,12 @@ def return_path(current_node):
                 angle = 180
         path[i] = [pos[0],pos[1],angle]
     path[-1] = [path[-1][0],path[-1][1],path[-2][2]]
+    np.savetxt('path.csv', path, delimiter=',')
     return path# Reversed path
 
 def astar(map,start,end):
+    start = (start[1], start[0])
+    end = (end[1], end[0])
     # Create start and end nodes
     start_node = NodeStar(None, start)
     start_node.g = start_node.h = start_node.f = 0
@@ -159,9 +163,9 @@ if __name__ == "__main__":
     # ogm.fromKeyframesCSV("../data/keyframes.csv")
 
     print(ogm.grid_map)
-    start = (1,0)
+    start = (0,1)
     #     row^ ^column
-    end =(20,7)
+    end =(7,20)
     #   row^ ^column
     line = astar(ogm,start,end)
     print(line)
@@ -184,10 +188,13 @@ if __name__ == "__main__":
         for point in line:
             ax.scatter(point[0], point[1])
 
-    ax.scatter(start[1],start[0],s=markersize)
-    ax.scatter(end[1],end[0],s=markersize)
+    ax.scatter(start[0],start[1],s=markersize)
+    ax.scatter(end[0],end[1],s=markersize)
 
     fig.show()
     line2 = ogm.getRealLocations(line)
     print(line2)
+
+
+
 

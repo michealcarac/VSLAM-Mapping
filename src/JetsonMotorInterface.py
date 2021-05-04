@@ -24,6 +24,7 @@ if (JETSON_BOARD_NAME == "NANO"):  # For Jetson Nano
 	RIGHT_PIN       = 36
 	# JETSON_CTRL_PIN = 32  // CDL=> Not needed
 elif (JETSON_BOARD_NAME == "AGX"):  # For Jetson AGX
+	pass
 	# FORWARDS_PIN    = CDL=> Find pin number
 	# BACKWARDS_PIN   = CDL=> Find pin number
 	# LEFT_PIN        = CDL=> Find pin number
