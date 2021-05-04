@@ -42,7 +42,7 @@ start = (0, 1)  # Col, Row (x, y)
 # occ_map.numpyArrayToCSV("/var/www/html/occupancy_map_data.csv")
 # send_live_location(start)
 
-def main(end = None)
+def main(end = None):
 
     # 6. Get end location from android
     if end == None:
