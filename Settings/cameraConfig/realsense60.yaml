@@ -1,0 +1,52 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters. Adjust them!
+#--------------------------------------------------------------------------------------------
+
+# Camera calibration and distortion parameters (OpenCV) 
+Camera.fx: 1332.15
+Camera.fy: 1332.15
+Camera.cx: 956.565
+Camera.cy: 560.068
+
+IR.fx: 456.8
+IR.fy: 456.8
+IR.cx: 255.2
+IR.cy: 180.4
+
+Delta_rgb_ir: 0.05915
+
+Camera.k1: 0
+Camera.k2: 0
+Camera.p1: 0
+Camera.p2: 0
+Camera.k3: 0
+
+# Camera Model #
+#==============#
+
+Camera.name: "REALSENSE D415"
+Camera.setup: "monocular"
+Camera.model: "perspective"
+
+Camera.fps: 30.0
+Camera.cols: 1920
+Camera.rows: 1080
+
+Camera.color_order: "RGB"
+
+#================#
+# ORB Parameters #
+#================#
+
+Feature.max_num_keypoints: 2000
+Feature.scale_factor: 1.2
+Feature.num_levels: 8
+Feature.ini_fast_threshold: 20
+Feature.min_fast_threshold: 7
+Feature.mask_rectangles:
+  - [0.0, 1.0, 0.0, 0.1]
+  - [0.0, 1.0, 0.84, 1.0]
+  - [0.0, 0.2, 0.7, 1.0]
+  - [0.8, 1.0, 0.7, 1.0]

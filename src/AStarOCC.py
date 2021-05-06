@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
 # Name           : AStarOCC.py
 # Date Created   : 2/26/2021
-# Author(s)      : Micheal Caracciolo, Chris Lloyd
+# Author(s)      : Micheal Caracciolo, Chris Lloyd, Owen Casciotti
 # Github Link    : https://github.com/michealcarac/VSLAM-Mapping
 # Description    : A* For Occupancy Map
 # Original Author: Nicholas Swift
@@ -17,8 +17,9 @@ from matplotlib import colors
 from OccupancyGridMap import OccupancyGridMap
 from MapFileUnpacker import Unpacker
 
+
 class NodeStar:
-    def __init__(self,parent=None,position=None):
+    def __init__(self, parent=None, position=None):
         self.parent = parent
         self.position = position
 
@@ -38,6 +39,7 @@ class NodeStar:
     def __gt__(self, other):
         return self.f > other.f
 
+
 def return_path(current_node):
     path = []
     current = current_node
@@ -48,10 +50,10 @@ def return_path(current_node):
 
     path = path[::-1]
 
-    for i in range(len(path)-1):
+    for i in range(len(path) - 1):
         pos = path[i]
-        next_pos = path[i+1]
-        if next_pos[0]-pos[0] == 0:
+        next_pos = path[i + 1]
+        if next_pos[0] - pos[0] == 0:
             if next_pos[1] > pos[1]:
                 angle = 90
             else:
@@ -61,12 +63,13 @@ def return_path(current_node):
                 angle = 0
             else:
                 angle = 180
-        path[i] = [pos[0],pos[1],angle]
-    path[-1] = [path[-1][0],path[-1][1],path[-2][2]]
-    np.savetxt('path.csv', path, delimiter=',')
-    return path# Reversed path
+        path[i] = [pos[0], pos[1], angle]
+    path[-1] = [path[-1][0], path[-1][1], path[-2][2]]
+    np.savetxt('../data/path.csv', path, delimiter=',')  # To be used in sending data
+    return path  # Reversed path
 
-def astar(map,start,end):
+
+def astar(map, start, end):
     start = (start[1], start[0])
     end = (end[1], end[0])
     # Create start and end nodes
@@ -82,14 +85,14 @@ def astar(map,start,end):
 
     # Heapify open_list and add the start_node
     heapq.heapify(open_list)
-    heapq.heappush(open_list,start_node)
+    heapq.heappush(open_list, start_node)
 
     # Adding a stop condition
     out_i = 0
-    max_i = map.getMaxCol()*map.getMaxRow()
+    max_i = map.getMaxCol() * map.getMaxRow()
 
     # Squares we search for
-    near_squares = ((0,-1),(0,1),(-1,0),(1,0))   # Four Directions, up,down,left,right
+    near_squares = ((0, -1), (0, 1), (-1, 0), (1, 0))  # Four Directions, up,down,left,right
 
     while len(open_list) != 0:  # While open list is not empty
 
@@ -113,8 +116,8 @@ def astar(map,start,end):
 
         for neighbor in near_squares:
             new_pos = (current_node.position[0] + neighbor[0], current_node.position[1] + neighbor[1])
-            if map.isValidIndexPoint(new_pos[::-1]): #Function takes in as X,Y, so we flip from Y,X
-                if map.isUnoccupiedIndex(new_pos[::-1]): #Function takes in as X,Y
+            if map.isValidIndexPoint(new_pos[::-1]):  # Function takes in as X,Y, so we flip from Y,X
+                if map.isUnoccupiedIndex(new_pos[::-1]):  # Function takes in as X,Y
                     new_node = NodeStar(current_node, new_pos)
                     if not (new_node in open_list):
                         children.append(new_node)
@@ -124,25 +127,22 @@ def astar(map,start,end):
             if len([closed_child for closed_child in closed_list if closed_child == child]) > 0:
                 continue
 
-            # Create Heuristic
-            #child.g = current_node.g + 1
-            #child.g = abs(child.position[0] - start_node.position[0]) + abs(child.position[1] - start_node.position[1])
+            # Create Heuristic child.g = current_node.g + 1 child.g = abs(child.position[0] - start_node.position[0])
+            # + abs(child.position[1] - start_node.position[1])
             child.g = current_node.g
-            #child.g = current_node.g + abs(child.position[0] - start_node.position[0]) + abs(child.position[1] - start_node.position[1])
-            # Manhattan Distance
+            # child.g = current_node.g + abs(child.position[0] - start_node.position[0]) + abs(child.position[1] -
+            # start_node.position[1]) Manhattan Distance
             child.h = abs(child.position[0] - end_node.position[0]) + abs(child.position[1] - end_node.position[1])
 
             child.f = child.g + child.h
             # Child on open list
-            if len([open_node for open_node in open_list if child.position == open_node.position and child.g > open_node.g]) > 0:
+            if len([open_node for open_node in open_list if
+                    child.position == open_node.position and child.g > open_node.g]) > 0:
                 continue
 
             # Add child to open list
-            heapq.heappush(open_list,child)
-
+            heapq.heappush(open_list, child)
     return None
-
-
 
 
 if __name__ == "__main__":
@@ -163,38 +163,25 @@ if __name__ == "__main__":
     # ogm.fromKeyframesCSV("../data/keyframes.csv")
 
     print(ogm.grid_map)
-    start = (0,1)
+    start = (0, 0)
     #     row^ ^column
-    end =(7,20)
+    end = (6, 31)  # Try (7,31) :)
     #   row^ ^column
-    line = astar(ogm,start,end)
+    line = astar(ogm, start, end)
     print(line)
-
-    # FROM VISUALIZE MAP # CDL=> Removed for now
-    # cmap = colors.ListedColormap(['brown', 'blue', 'green', 'brown'])
-    # bounds = [-1000, 0, ogm.cell_threshold, 1, 1000]
-    # norm = colors.BoundaryNorm(bounds, cmap.N)
-    # fig, ax = plt.subplots()
-    # ax.imshow(ogm.grid_map, origin='lower', cmap=cmap, norm=norm)
-    # When doing poorly formatted maps:
-    #ax.imshow(ogm.grid_map, origin='lower', cmap=cmap, norm=norm, aspect='auto')
 
     # Visualize gridmap
     fig, ax = ogm.visualizeGrid()
 
     # Add A star path points to map
-    markersize = 100 # Size of start and end points (5-100 is a good range)
-    if line != None:
+    markersize = 100  # Size of start and end points (5-100 is a good range)
+    if line is not None:
         for point in line:
             ax.scatter(point[0], point[1])
 
-    ax.scatter(start[0],start[1],s=markersize)
-    ax.scatter(end[0],end[1],s=markersize)
+    ax.scatter(start[0], start[1], s=markersize)
+    ax.scatter(end[0], end[1], s=markersize)
+    plt.show()
 
-    fig.show()
-    line2 = ogm.getRealLocations(line)
-    print(line2)
-
-
-
-
+    real = ogm.getRealLocations(line)
+    print(real)

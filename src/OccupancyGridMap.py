@@ -290,7 +290,7 @@ class OccupancyGridMap:
         ax.imshow(self.grid_map, origin='lower', cmap=cmap, norm=norm)
 
         plt.axis("off")
-        #plt.show() MC=> This breaks plotting. 
+        #plt.show() MC=> This breaks plotting. Instead call after visualizeGrid() is ran
         return fig, ax
 
     def numpyArrayToCSV(self, file):
@@ -432,12 +432,14 @@ class OccupancyGridMap:
 # ------------------------------------------------------------------------------
 
 # Main code for this file. Only runs if this file is the top file
+# Strictly ran for testing
 if __name__ == "__main__":
     ogm = OccupancyGridMap()
 
     # Get keyframe data from map file
     print("Unpacking MSG file...")
-    unpack = Unpacker("../data/map.msg")
+    unpack = Unpacker()
+    unpack.unpackMSGmap("../data/map.msg")
     keyframes = unpack.extract_keyframe_data()
     # Remove z axis data
     keyframes = np.delete(keyframes, 2, 1)
@@ -450,7 +452,7 @@ if __name__ == "__main__":
 
     print("Visualizing grid map data...")
     ogm.visualizeGrid()
-
+    plt.show()
     # Create occupancy grid map data csv file KAB
     # numpyArrayToCSV() # NOTE: added this for testing of function will not use until completely ready
 

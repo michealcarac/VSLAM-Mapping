@@ -1,10 +1,10 @@
 #define joyX A1   // X Equals left or right.
 #define joyY A0   // Y Equals Direction Forward or Backwards
 
-#define FORWARD_PIN  13
-#define BACKWARD_PIN 12
-#define LEFT_PIN     11
-#define RIGHT_PIN    10
+#define FORWARD_PIN  13 // Change depending on your Arduino Pin
+#define BACKWARD_PIN 12 // Change depending on your Arduino Pin
+#define LEFT_PIN     11 // Change depending on your Arduino Pin
+#define RIGHT_PIN    10 // Change depending on your Arduino Pin
 
 
 int R_Dir; // Right wheel
@@ -31,7 +31,7 @@ void loop() {
   int xValue = analogRead(joyX);
   int yValue = analogRead(joyY);
 
-  // Maping the values from the Y direction of the Joystick, Forward or Backward
+  // Mapping the values from the Y direction of the Joystick, Forward or Backward
   if (yValue >= 515){
     R_Dir = map(yValue, 541, 1024, 0, max_speed);
     L_Dir = -R_Dir;
@@ -43,7 +43,7 @@ void loop() {
     L_Dir = -R_Dir;
   }
 
-  // Maping the values for Left and Right
+  // Mapping the values for Left and Right
   int dir = 0;
    if (xValue >= 531){                              // Turning Right
     dir = map(xValue, 503, 1024, 0, max_speed);

@@ -1,3 +1,11 @@
+# ------------------------------------------------------------------------------
+# Name         : MapFileUnpacker.py
+# Date Created : 2/22/2021
+# Author(s)    : Micheal Caracciolo, Chris Lloyd, Owen Casciotti
+# Github Link  : https://github.com/michealcarac/VSLAM-Mapping
+# Description  : Unpacks .msg files.
+# ------------------------------------------------------------------------------
+
 import csv
 import msgpack
 import numpy as np
@@ -96,16 +104,19 @@ class Unpacker:
         return newc
 
     def export(self):
-        with open('mapdataKeyframes.txt', 'w') as csvfile:
+        with open('../data/mapdataKeyframes.csv', 'w') as csvfile:
             mapwriter = csv.writer(csvfile, delimiter=',')
             mapwriter.writerows(self.keyframes_pos)
-        with open('mapdataLandmarks.txt', 'w') as csvfile:
+        with open('../data/mapdataLandmarks.csv', 'w') as csvfile:
             mapwriter = csv.writer(csvfile, delimiter=',')
             mapwriter.writerows(self.landmark_coords)
 
 
 if __name__ == "__main__":
-    unpack = Unpacker("/run/media/spixy/New Volume/Research/openvslam_occ_grid-master/map.msg")
-    unpack.extract_landmark_data()
-    unpack.extract_keyframe_data()
-    unpack.export()
+    unpack = Unpacker()
+    unpack.unpackMSGmap("../data/map.msg")
+    lm = unpack.extract_landmark_data()
+    kf = unpack.extract_keyframe_data()
+    print('landmarks:', lm)
+    print('keyframes:', kf)
+    unpack.export() #Will export keyframes/landmarks to csv files
