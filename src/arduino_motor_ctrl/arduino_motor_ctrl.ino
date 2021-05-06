@@ -1,16 +1,16 @@
 #define joyX A1   // X Equals left or right.
 #define joyY A0   // Y Equals Direction Forward or Backwards
 
-#define FORWARD_PIN  10
-#define BACKWARD_PIN 11
-#define LEFT_PIN     12
-#define RIGHT_PIN    13
+#define FORWARD_PIN  13
+#define BACKWARD_PIN 12
+#define LEFT_PIN     11
+#define RIGHT_PIN    10
 
 
 int R_Dir; // Right wheel
 int L_Dir; // Left wheel
 
-const int max_speed = 500;
+const int max_speed = 400;
 const int min_speed = -max_speed;
 
 void setup() {
@@ -55,32 +55,44 @@ void loop() {
     R_Dir = L_Dir;
   }
 
-  if      (digitalRead(FORWARD_PIN) == LOW)  // Go forward
+  if (((digitalRead(FORWARD_PIN) == HIGH) || (digitalRead(BACKWARD_PIN) == HIGH) || (digitalRead(LEFT_PIN) == HIGH) || (digitalRead(RIGHT_PIN) == HIGH)))
   {
-    R_Dir = max_speed;
-    L_Dir = -max_speed;
+    if (digitalRead(FORWARD_PIN) == LOW)  // Go forward
+    {
+//        Serial.write("Forwards\r\n");
+      R_Dir = max_speed;
+      L_Dir = -max_speed;
+    }
+    else if (digitalRead(BACKWARD_PIN) == LOW) // Go backwards
+    {
+//      Serial.write("Backwards\r\n");
+      R_Dir = -max_speed;
+      L_Dir = max_speed;
+    }
+    else if (digitalRead(LEFT_PIN) == LOW)     // Turn left
+    {
+//      Serial.write("Left\r\n");
+      R_Dir = max_speed / 2;
+      L_Dir = max_speed / 2;
+    }
+    else if (digitalRead(RIGHT_PIN) == LOW)    // Turn right
+    {
+//      Serial.write("Right\r\n");
+      R_Dir = -max_speed / 2;
+      L_Dir = -max_speed / 2;
+    }
   }
-  else if (digitalRead(BACKWARD_PIN) == LOW) // Go backwards
-  {
-    R_Dir = -max_speed;
-    L_Dir = max_speed;
-  }
-  else if (digitalRead(LEFT_PIN) == LOW)     // Turn left
-  {
-    R_Dir = max_speed / 2;
-    L_Dir = max_speed / 2;
-  }
-  else if (digitalRead(RIGHT_PIN) == LOW)    // Turn right
-  {
-    R_Dir = -max_speed / 2;;
-    L_Dir = -max_speed / 2;;
-  }
+//  else
+//  {
+//    R_Dir = 0;
+//    L_Dir = 0;
+//  }
 
   Serial.write("M1: ");
-  Serial.print(-L_Dir+20);
+  Serial.print(-L_Dir);
   Serial.write("\r\n");
   Serial.write("M2: ");
-  Serial.print(R_Dir);
+  Serial.print((int)((float)R_Dir * 0.98)); // *1.036  //  * 0.93
   Serial.write("\r\n");
 
   delay(500);
