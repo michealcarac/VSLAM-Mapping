@@ -112,9 +112,12 @@ OpenVSLAM:
 $ cd /path/to/VSLAMdir
 $ git clone https://github.com/2020fork/openvslam.git
 $ cd openvslam
-Replace the /examples/run_camera_localization with our modified run_camera_localization
-Add the orb_vocab folder to the openvslam directory
+```
+Replace the /examples/run_camera_localization with our modified Settings/run_camera_localization
+Add the Settings/orb_vocab folder to the openvslam directory
+Add Settings/CameraConfig to the openvslam directory
 In OPENVSLAM directory:
+```
 $ cmake -DBUILD_WITH_MARCH_NATIVE=OFF -DUSE_PANGOLIN_VIEWER=ON -DINSTALL_PANGOLIN_VIEWER=ON -DUSE_SOCKET_PUBLISHER=OFF -DUSE_STACK_TRACE_LOGGER=ON -DBOW_FRAMEWORK=DBoW2 -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
 
 $ make -j8
