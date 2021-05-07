@@ -63,7 +63,9 @@ OpenCV:
 $ cd /path/to/VSLAMdir
 ```
 Follow guide to install OpenCV: https://learnopencv.com/install-opencv-3-4-4-on-ubuntu-18-04/ 
+
 Make sure to CMAKE_INSTALL_PREFIX=/usr/local when running the cmake for OpenCV.
+
 If you cannot find libjasper, run this:
 ```
 $ echo "deb http://us.archive.ubuntu.com/ubuntu/ yakkety universe" | sudo tee -a /etc/apt/sources.list
@@ -115,8 +117,11 @@ $ git clone https://github.com/2020fork/openvslam.git
 $ cd openvslam
 ```
 Replace the /examples/run_camera_localization with our modified Settings/run_camera_localization
+
 Add the Settings/orb_vocab folder to the openvslam directory
+
 Add Settings/CameraConfig to the openvslam directory
+
 In OPENVSLAM directory:
 ```
 $ cmake -DBUILD_WITH_MARCH_NATIVE=OFF -DUSE_PANGOLIN_VIEWER=ON -DINSTALL_PANGOLIN_VIEWER=ON -DUSE_SOCKET_PUBLISHER=OFF -DUSE_STACK_TRACE_LOGGER=ON -DBOW_FRAMEWORK=DBoW2 -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
@@ -129,6 +134,7 @@ Make a map:
 $ ./run_camera_slam -v ./orb_vocab/orb_vocab.dbow2 -n 2 -c ./cameraConfig/realsense60.yaml -p ../../ECELAB_map.msg
 ```
 Note: Make sure the msg file is outside of VSLAM's directory as it may not create it due to permission issues
+
 Run Localization on said map:
 ```
 $ ./run_camera_localization -v ./orb_vocab/orb_vocab.dbow2 -n 2 -c ./cameraConfig/realsense60.yaml -p ../../ECELAB_map.msg
