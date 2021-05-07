@@ -11,39 +11,39 @@ $ apt update -y
 $ apt upgrade -y --no-install-recommends
 ```
 
-# Basic dependencies
+ Basic dependencies
 ```$ apt install -y build-essential pkg-config cmake git wget curl unzip```
 
-# g2o dependencies
+ g2o dependencies
 ```$ apt install -y libatlas-base-dev libsuitesparse-dev```
 
-# OpenCV dependencies
+ OpenCV dependencies
 ```
 $ apt install -y libgtk-3-dev
 $ apt install -y ffmpeg
 $ apt install -y libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev
 ```
 
-# Eigen dependencies
+ Eigen dependencies
 ```$ apt install -y gfortran```
 
-# Other dependencies
+ Other dependencies
 ```$ apt install -y libyaml-cpp-dev libgoogle-glog-dev libgflags-dev```
 
-# Pangolin dependencies
+ Pangolin dependencies
 ```
 
 $ apt install -y libglew-dev
 ```
 
-# Build Programs
+## Build Programs
 
 Create a directory for all programs:
 
 ```
 $ mkdir VSLAMdir && cd VSLAMdir
 ```
-Eigen: 
+### Eigen: 
 ```
 $ cd /path/to/VSLAMdir
 $ wget -q https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.bz2
@@ -58,7 +58,7 @@ $ make install
 ```
 #NOTE: may need sudo for the $ make install
 
-OpenCV:
+### OpenCV:
 ```
 $ cd /path/to/VSLAMdir
 ```
@@ -74,7 +74,7 @@ $ sudo apt-get update
 ```
 Then, try to download the libjasper again. 
 
-DBoW2:
+### DBoW2:
 ```
 $ cd /path/to/VSLAMdir
 $ git clone https://github.com/OpenVSLAM-Community/DBoW2.git
@@ -85,7 +85,7 @@ $ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
 $ make -j8
 $ make install
 ```
-g2o:
+### g2o:
 ```
 $ cd path/to/VSLAMdir
 $ git clone https://github.com/RainerKuemmerle/g2o.git
@@ -98,7 +98,7 @@ $ make -j8
 $ make install
 ```
 
-Pangolin:
+### Pangolin:
 ```
 $ cd /path/to/VSLAMdir
 $ git clone https://github.com/stevenlovegrove/Pangolin.git
@@ -110,7 +110,7 @@ $ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
 $ make -j8
 $ make install
 ```
-OpenVSLAM:
+### OpenVSLAM:
 ```
 $ cd /path/to/VSLAMdir
 $ git clone https://github.com/2020fork/openvslam.git
