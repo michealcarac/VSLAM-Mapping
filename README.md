@@ -10,6 +10,7 @@ Micheal Caracciolo           - Sophomore, ECE Department
 Owen Casciotti               - Senior, ECE Department
 Chris Lloyd                  - Senior, ECE Department
 Ernesto Schumann-Sola        - Freshman, ECE Department
+Matthew Weaver               - Sophomore, ECE Department
 Kyle Bielby                  - Senior, ECE Department
 Baset Sarker                 - Graduate Student, ECE Department
 Tipu Sultan                  - Graduate Student, ME Department
