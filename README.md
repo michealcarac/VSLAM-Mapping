@@ -82,7 +82,7 @@ Note: There is some example data and maps in the csv format. This format is requ
 
 
 
-Android Phone,
+Android Phone, APK [here](https://github.com/kbielby09/Presidential_Challenge_App)
 
 * Insert the IP wanting to connect to, in this instance, the static IP of the Jetson
 * Build the Java app to your Android Phone
@@ -103,6 +103,8 @@ Note: To properly run ```main.py``` without any issues, it is recommended to fol
 Note: We are using a Sabertooth 2x32 Dual 32A Motor Driver to drive our dual Wheelchair motors. The Arduino also gets it's power from the Motor Driver, but do not connect it there while it is connected to the computer for building. 
 
 A few things to be weary of, in the ```main.py```, since we are not using the Localization from VSLAM, we are simulating the created map into a path. This path will run differently depending on how accurate it is and the speed of your motors. We recommend you to scale your room to your map, so you will want to section out your map in code and have a timing ratio to ensure it moves the right distance of "Occupancy Grid Map spaces". This is explained better in the code. 
+
+The Reinforcement Learning files inside of /src/RL are purely experimental and do work for training. However, due to time constraints, they have not been polished enough to work with our design. They are published here for any future use as they are completely made open-source. 
 
 
 
