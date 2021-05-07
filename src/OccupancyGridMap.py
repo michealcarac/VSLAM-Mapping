@@ -14,7 +14,6 @@ import matplotlib.pyplot as plt
 from matplotlib import colors
 import numpy as np
 import csv
-from typing import Tuple
 
 class OccupancyGridMap:
     """

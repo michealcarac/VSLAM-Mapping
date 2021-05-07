@@ -11,7 +11,7 @@ import csv
 import websockets
 
 # uri = "ws://localhost:9001"
-uri = "ws://128.153.161.14:9001"  # Placeholder url.
+uri = "ws://localhost:9001"  # Placeholder url. Replace with your IP
 
 
 # Still need to add more sends
