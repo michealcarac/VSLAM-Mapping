@@ -12,7 +12,7 @@ Chris Lloyd                  - Senior, ECE Department
 Ernesto Sola-Thomas          - Freshman, ECE Department
 Matthew Weaver               - Sophomore, ECE Department
 Kyle Bielby                  - Senior, ECE Department
-Md Abdul Baset Sarker                 - Graduate Student, ECE Department
+Md Abdul Baset Sarker        - Graduate Student, ECE Department
 Tipu Sultan                  - Graduate Student, ME Department
 Masudul Imtiaz               - Professor, Clarkson University ECE Department
 ```
@@ -20,8 +20,9 @@ Masudul Imtiaz               - Professor, Clarkson University ECE Department
 This project began in January 2021 and was finished May 5th 2021. 
 
 ### Synopsis
-
-
+Presenting the development of a Simultaneous
+Localization and Mapping (SLAM) based Autonomous
+Navigation system.
 
 ### Supported Devices:
 
