@@ -12,7 +12,7 @@ Chris Lloyd                  - Senior, ECE Department
 Ernesto Sola-Thomas          - Freshman, ECE Department
 Matthew Weaver               - Sophomore, ECE Department
 Kyle Bielby                  - Senior, ECE Department
-Baset Sarker                 - Graduate Student, ECE Department
+Md Abdul Baset Sarker                 - Graduate Student, ECE Department
 Tipu Sultan                  - Graduate Student, ME Department
 Masudul Imtiaz               - Professor, Clarkson University ECE Department
 ```
