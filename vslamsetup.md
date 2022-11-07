@@ -1,6 +1,7 @@
 # Open VSLAM Installation Instructions
 
-Official Documents can be found [here](https://openvslam-community.readthedocs.io/_/downloads/en/latest/pdf/)
+Official Documents can be found ~~[here](https://openvslam-community.readthedocs.io/_/downloads/en/latest/pdf/)~~    
+It seems the last official document page is now gone.
 
 # Pre-Requisites:
 
