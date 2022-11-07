@@ -69,7 +69,8 @@ websockets
 
 ## Initial Setup
 
-OpenVSLAM, [Official Documentation](https://openvslam-community.readthedocs.io/_/downloads/en/latest/pdf/)
+OpenVSLAM, ~~[Official Documentation](https://openvslam-community.readthedocs.io/_/downloads/en/latest/pdf/)~~    
+Official Documentation now lost to time. 
 
 * Refer to [vslamsetup.md](https://github.com/michealcarac/VSLAM-Mapping/blob/main/vslamsetup.md)
 
