@@ -18,6 +18,8 @@ Masudul Imtiaz               - Professor, Clarkson University ECE Department
 ```
 
 This project began in January 2021 and was finished May 5th 2021. 
+As of May 23rd 2022, this project has been submitted to the IEEE MDTS Conference:
+[Link](https://ieeexplore.ieee.org/document/9826969)
 
 ### Synopsis
 Presenting the development of a Simultaneous
